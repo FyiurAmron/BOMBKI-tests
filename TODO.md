@@ -26,7 +26,9 @@ This file lists only remaining work.
    BTRUDNO), and the rare-gain branches of the loot
    procedures), built and run host-native by
    `tests/run_unit_tests.py` and merged into the Callgrind
-   coverage (PRZEDM.PAS 170 -> 794 lines). Next: the SWIAT room
+   coverage (PRZEDM.PAS 170 -> 794 lines; the WALKA tests
+   run in milliseconds because the runner links a Delay
+   stub that wraps the crt unit's Delay). Next: the SWIAT room
    procedures (they read commands from stdin, so the runner
    must pipe input), the remaining PRZEDM procedures (POROWNANIE,
    SMIERC, PIERDOLY, MINIARENA, FIGHTSCENA, FIGHTBLUSZCZ -

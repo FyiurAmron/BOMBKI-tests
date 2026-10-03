@@ -40,6 +40,8 @@ UNIT_NAMES = ("MONSTRA", "PRZEDM", "SWIAT")
 PROGRAM_NAME = "BOMBKI"
 DEBUG_FLAGS = ("-g",)
 UNCOVERED_PREVIEW = 40
+DELAYSTUB = UNIT_TEST_DIR / "delaystub.c"
+DELAY_SYMBOL = "CRT_$$_DELAY$WORD"
 SUMMARY = re.compile(r"tests: (\d+), failures: (\d+)")
 
 
@@ -111,17 +113,38 @@ def run_scenarios(wrapper: Path, out_dir: Path, timeout: float,
     return results
 
 
+def build_delay_stub(build_dir: Path) -> Path:
+    """Compile the Delay stub so the link can --wrap crt Delay."""
+    cc = shutil.which("cc") or shutil.which("gcc")
+    if cc is None:
+        raise RuntimeError("no C compiler (cc or gcc) for the Delay stub")
+    obj = build_dir / "delaystub.o"
+    command = [cc, "-c", str(DELAYSTUB), "-o", str(obj)]
+    print("+", subprocess.list2cmdline(command))
+    subprocess.run(command, check=True)
+    return obj
+
+
 def build_unit_tests(fpc: str, build_dir: Path) -> list[Path]:
     """Compile the framework and every tests/units program with -g."""
     build_dir.mkdir(parents=True, exist_ok=True)
-    sources = [UNIT_TEST_DIR / "pastest.pas"]
-    sources.extend(SOURCES / f"{name}.PAS" for name in UNIT_NAMES)
-    sources.extend(sorted(UNIT_TEST_DIR.glob("test_*.pas")))
-    for source in sources:
+    stub = build_delay_stub(build_dir)
+    link_args = [f"-k--wrap={DELAY_SYMBOL}", f"-k{stub}"]
+    unit_sources = [UNIT_TEST_DIR / "pastest.pas"]
+    unit_sources.extend(SOURCES / f"{name}.PAS" for name in UNIT_NAMES)
+    for source in unit_sources:
         command = [
             fpc, "-B", "-Mtp", "-Tlinux", "-Px86_64", *DEBUG_FLAGS,
             f"-Fu{SOURCES}", f"-Fu{build_dir}", f"-Fu{UNIT_TEST_DIR}",
             f"-FU{build_dir}", f"-FE{build_dir}", str(source),
+        ]
+        print("+", subprocess.list2cmdline(command))
+        subprocess.run(command, cwd=build_dir, check=True)
+    for source in sorted(UNIT_TEST_DIR.glob("test_*.pas")):
+        command = [
+            fpc, "-B", "-Mtp", "-Tlinux", "-Px86_64", *DEBUG_FLAGS,
+            f"-Fu{SOURCES}", f"-Fu{build_dir}", f"-Fu{UNIT_TEST_DIR}",
+            f"-FU{build_dir}", f"-FE{build_dir}", *link_args, str(source),
         ]
         print("+", subprocess.list2cmdline(command))
         subprocess.run(command, cwd=build_dir, check=True)

@@ -32,6 +32,8 @@ UNIT_TESTS = PROJECT / "tests" / "units"
 FRAMEWORK = "pastest"
 UNIT_NAMES = ("MONSTRA", "PRZEDM", "SWIAT")
 BUILD_DIR = PROJECT / "build" / "tmp" / "unit-tests"
+DELAYSTUB = UNIT_TESTS / "delaystub.c"
+DELAY_SYMBOL = "CRT_$$_DELAY$WORD"
 
 TARGET_FLAGS = {
     "linux": ("-Tlinux", "-Px86_64"),
@@ -62,25 +64,43 @@ def host_target() -> str:
 
 
 def compile_source(fpc: str, source: Path, build_dir: Path,
-                   target: str) -> None:
+                   target: str,
+                   link_args: list[str] | None = None) -> None:
     command = [
         fpc, "-B", "-Mtp", *TARGET_FLAGS[target],
         f"-Fu{SOURCES}", f"-Fu{build_dir}", f"-Fu{UNIT_TESTS}",
-        f"-FU{build_dir}", f"-FE{build_dir}", str(source),
+        f"-FU{build_dir}", f"-FE{build_dir}",
     ]
+    if link_args:
+        command.extend(link_args)
+    command.append(str(source))
     print("+", subprocess.list2cmdline(command))
     subprocess.run(command, cwd=build_dir, check=True)
+
+
+def build_delay_stub(build_dir: Path) -> Path:
+    """Compile the Delay stub so the link can --wrap crt Delay."""
+    cc = shutil.which("cc") or shutil.which("gcc")
+    if cc is None:
+        raise RuntimeError("no C compiler (cc or gcc) for the Delay stub")
+    obj = build_dir / "delaystub.o"
+    command = [cc, "-c", str(DELAYSTUB), "-o", str(obj)]
+    print("+", subprocess.list2cmdline(command))
+    subprocess.run(command, check=True)
+    return obj
 
 
 def build_tests(fpc: str, target: str) -> list[Path]:
     """Compile the framework, the units, and every test program."""
     BUILD_DIR.mkdir(parents=True, exist_ok=True)
+    stub = build_delay_stub(BUILD_DIR)
+    link_args = [f"-k--wrap={DELAY_SYMBOL}", f"-k{stub}"]
     compile_source(fpc, UNIT_TESTS / f"{FRAMEWORK}.pas", BUILD_DIR, target)
     for name in UNIT_NAMES:
         compile_source(fpc, SOURCES / f"{name}.PAS", BUILD_DIR, target)
     programs = []
     for source in sorted(UNIT_TESTS.glob("test_*.pas")):
-        compile_source(fpc, source, BUILD_DIR, target)
+        compile_source(fpc, source, BUILD_DIR, target, link_args)
         program = BUILD_DIR / source.stem
         if sys.platform == "win32":
             program = program.with_suffix(".exe")
@@ -115,8 +135,11 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--fpc", default=os.environ.get("FPC", "fpc"),
                         help="FPC executable (default: FPC env var or fpc)")
-    parser.add_argument("--timeout", type=float, default=600.0,
-                        help="seconds allowed for each run (default: 600)")
+    parser.add_argument("--timeout", type=float, default=240.0,
+                        help="seconds allowed for each run "
+                             "(default: 240; the Delay stub "
+                             "makes the WALKA tests run in "
+                             "milliseconds)")
     args = parser.parse_args()
 
     failed = False
