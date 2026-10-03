@@ -64,10 +64,28 @@ python3 tools/coverage_callgrind.py
 ```
 
 The report lists per-file covered/total lines with uncovered line
-numbers, summed over every scenario run; `--fail-under 100` gates a
+numbers, summed over every scenario run and every unit-test
+program run; `--fail-under 100` gates a
 run on the 100% coverage goal. Coverage builds with DWARF info and
 profiles the host-native executable, so it is not DOS behavior
-evidence.
+evidence. Pass `--no-unit-tests` to measure the scenario runs
+alone.
+
+Run the Pascal unit tests (host-native FPC build):
+
+```sh
+python3 tests/run_unit_tests.py
+```
+
+The unit tests under `tests/units` are plain Pascal programs
+that use the reconstructed units directly, so they can assert
+on unit internals (global state, deterministic procedures)
+that the PTY scenarios only observe through the game's
+terminal output. The framework `tests/units/bkitest.pas` is
+plain TP-compatible Pascal, so the same test sources can later
+compile with genuine TP7. The runner builds them with FPC
+`-Mtp` and executes every test in a fresh process, because
+the units keep global state.
 
 Compile with genuine TP7 in DOSBox-X, without starting the game:
 

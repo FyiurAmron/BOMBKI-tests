@@ -5,14 +5,16 @@ There is no gcov-equivalent coverage tool for Free Pascal (gcov/lcov
 need GCC instrumentation, Delphi coverage tools are Windows/Delphi
 only). This script instead builds the reconstructed units with DWARF
 debug info, runs every tests/scenarios/*.json scenario under Valgrind
-Callgrind through the existing PTY harness, and maps executed
+Callgrind through the existing PTY harness, and runs the tests/units
+Pascal unit-test programs under Callgrind as well. It maps executed
 instruction addresses back to Pascal source lines using the DWARF line
 tables read via readelf. Callgrind dumps its profile even when the
 harness terminates the still-running game with SIGTERM.
 
 Coverage is reported per source file against all lines that have
-generated code. Exit status is nonzero when a scenario fails or when
-total line coverage is below --fail-under (the project goal is 100%).
+generated code. Exit status is nonzero when a scenario or a unit-test
+program fails or when total line coverage is below --fail-under (the
+project goal is 100%).
 """
 
 from __future__ import annotations
@@ -33,10 +35,12 @@ PROJECT = Path(__file__).resolve().parents[1]
 SOURCES = PROJECT / "_reconstructed"
 TESTS = PROJECT / "tests"
 SCENARIO_DIR = TESTS / "scenarios"
+UNIT_TEST_DIR = TESTS / "units"
 UNIT_NAMES = ("MONSTRA", "PRZEDM", "SWIAT")
 PROGRAM_NAME = "BOMBKI"
 DEBUG_FLAGS = ("-g",)
 UNCOVERED_PREVIEW = 40
+SUMMARY = re.compile(r"tests: (\d+), failures: (\d+)")
 
 
 def find_executable(name: str) -> str:
@@ -105,6 +109,85 @@ def run_scenarios(wrapper: Path, out_dir: Path, timeout: float,
             if completed.stderr.strip():
                 print(completed.stderr.strip(), file=sys.stderr)
     return results
+
+
+def build_unit_tests(fpc: str, build_dir: Path) -> list[Path]:
+    """Compile the framework and every tests/units program with -g."""
+    build_dir.mkdir(parents=True, exist_ok=True)
+    sources = [UNIT_TEST_DIR / "bkitest.pas"]
+    sources.extend(SOURCES / f"{name}.PAS" for name in UNIT_NAMES)
+    sources.extend(sorted(UNIT_TEST_DIR.glob("test_*.pas")))
+    for source in sources:
+        command = [
+            fpc, "-B", "-Mtp", "-Tlinux", "-Px86_64", *DEBUG_FLAGS,
+            f"-Fu{SOURCES}", f"-Fu{build_dir}", f"-Fu{UNIT_TEST_DIR}",
+            f"-FU{build_dir}", f"-FE{build_dir}", str(source),
+        ]
+        print("+", subprocess.list2cmdline(command))
+        subprocess.run(command, cwd=build_dir, check=True)
+    binaries = []
+    for source in sorted(UNIT_TEST_DIR.glob("test_*.pas")):
+        binary = build_dir / source.stem
+        if not binary.is_file() or not binary.stat().st_size:
+            raise RuntimeError(f"FPC did not produce a nonempty {binary}")
+        binaries.append(binary)
+    if not binaries:
+        raise RuntimeError(f"no test programs found in {UNIT_TEST_DIR}")
+    return binaries
+
+
+def run_unit_programs(binaries: list[Path], out_dir: Path,
+                      timeout: float) -> list[dict]:
+    """Run every unit-test program under Callgrind; return results."""
+    results = []
+    for binary in binaries:
+        run_dir = out_dir / "runs" / "unit-tests" / binary.name
+        run_dir.mkdir(parents=True, exist_ok=True)
+        profile = run_dir / "callgrind.out"
+        wrapper = run_dir / "run-valgrind.sh"
+        write_wrapper(wrapper, binary)
+        environment = os.environ.copy()
+        environment["CG_OUT_FILE"] = str(profile)
+        command = [str(wrapper)]
+        print("+", subprocess.list2cmdline(command))
+        completed = subprocess.run(command, cwd=run_dir, env=environment,
+                                   capture_output=True, text=True,
+                                   errors="replace", timeout=timeout)
+        summary = SUMMARY.search(completed.stdout)
+        passed = (completed.returncode == 0 and summary is not None
+                  and int(summary.group(2)) == 0
+                  and profile.is_file() and profile.stat().st_size > 0)
+        results.append({"program": binary.name, "passed": passed,
+                        "profile": profile, "line_map": LineMap(binary)})
+        if not passed:
+            print(f"! unit tests {binary.name} failed "
+                  f"(exit {completed.returncode})", file=sys.stderr)
+            if completed.stdout.strip():
+                print(completed.stdout.strip(), file=sys.stderr)
+            if completed.stderr.strip():
+                print(completed.stderr.strip(), file=sys.stderr)
+    return results
+
+
+def map_profile(profile: Path, line_map: LineMap,
+                target_sources: set[Path],
+                covered: dict[tuple[Path, int], int]
+                ) -> tuple[int, int]:
+    """Add a dump's covered lines to the totals; return stats."""
+    mapped = 0
+    mismatches = 0
+    for address, profile_line, cost in parse_callgrind(profile):
+        found = line_map.lookup(address)
+        if found is None:
+            continue  # runtime library code without debug info
+        path, table_line = found
+        if path not in target_sources:
+            continue
+        mapped += 1
+        if profile_line != table_line:
+            mismatches += 1
+        covered[(path, table_line)] += cost
+    return mapped, mismatches
 
 
 class LineMap:
@@ -253,6 +336,8 @@ def main() -> int:
     parser.add_argument("--fail-under", type=float, default=0.0,
                         help="required total line coverage in percent "
                              "(default: 0, report only; the goal is 100)")
+    parser.add_argument("--no-unit-tests", action="store_true",
+                        help="measure coverage from the scenarios only")
     args = parser.parse_args()
 
     try:
@@ -262,6 +347,12 @@ def main() -> int:
         out_dir = PROJECT / "build" / "coverage"
         out_dir.mkdir(parents=True, exist_ok=True)
         binary = build_game(fpc, PROJECT / "build" / "tmp" / "coverage-game")
+        unit_results: list[dict] = []
+        if not args.no_unit_tests:
+            unit_binaries = build_unit_tests(
+                fpc, PROJECT / "build" / "tmp" / "coverage-units")
+            unit_results = run_unit_programs(
+                unit_binaries, out_dir, args.timeout)
         wrapper = out_dir / "run-valgrind.sh"
         write_wrapper(wrapper, binary)
         scenario_paths = args.scenarios or sorted(SCENARIO_DIR.glob("*.json"))
@@ -269,15 +360,17 @@ def main() -> int:
             parser.error("no scenario files found")
         results = run_scenarios(wrapper, out_dir, args.timeout, scenario_paths)
 
-        line_map = LineMap(binary)
+        line_maps = [LineMap(binary)]
+        line_maps.extend(result["line_map"] for result in unit_results)
         target_sources = {
             (SOURCES / f"{name}.PAS").resolve()
             for name in (*UNIT_NAMES, PROGRAM_NAME)
         }
         totals: dict[Path, set[int]] = defaultdict(set)
-        for _, _, _, lines, path in line_map.ranges:
-            if path in target_sources:
-                totals[path].update(lines)
+        for line_map in line_maps:
+            for _, _, _, lines, path in line_map.ranges:
+                if path in target_sources:
+                    totals[path].update(lines)
 
         covered: dict[tuple[Path, int], int] = defaultdict(int)
         mismatches = 0
@@ -285,24 +378,28 @@ def main() -> int:
         for result in results:
             if not result["profile"].is_file():
                 continue  # failed run without a Callgrind dump
-            for address, profile_line, cost in parse_callgrind(result["profile"]):
-                found = line_map.lookup(address)
-                if found is None:
-                    continue  # runtime library code without debug info
-                path, table_line = found
-                if path not in target_sources:
-                    continue
-                mapped += 1
-                if profile_line != table_line:
-                    mismatches += 1
-                covered[(path, table_line)] += cost
+            result_mapped, result_mismatches = map_profile(
+                result["profile"], line_maps[0], target_sources, covered)
+            mapped += result_mapped
+            mismatches += result_mismatches
+        for result in unit_results:
+            if not result["profile"].is_file():
+                continue  # failed run without a Callgrind dump
+            result_mapped, result_mismatches = map_profile(
+                result["profile"], result["line_map"],
+                target_sources, covered)
+            mapped += result_mapped
+            mismatches += result_mismatches
 
         covered_by_file: dict[Path, set[int]] = defaultdict(set)
         for (path, line) in covered:
             covered_by_file[path].add(line)
 
+        runs = f"{len(results)} scenario runs"
+        if unit_results:
+            runs += f" and {len(unit_results)} unit-test programs"
         print()
-        print(f"Coverage from {len(results)} scenario runs "
+        print(f"Coverage from {runs} "
               f"({mapped} executed source positions)")
         if mismatches:
             print(f"WARNING: {mismatches} line mismatches between the "
@@ -333,11 +430,17 @@ def main() -> int:
         if failed:
             names = ", ".join(result["scenario"] for result in failed)
             print(f"failed scenarios: {names}", file=sys.stderr)
+        failed_units = [result for result in unit_results
+                        if not result["passed"]]
+        if failed_units:
+            names = ", ".join(result["program"] for result in failed_units)
+            print(f"failed unit-test programs: {names}", file=sys.stderr)
         if overall < args.fail_under:
             print(f"line coverage {overall:.2f}% is below the required "
                   f"{args.fail_under:.2f}%", file=sys.stderr)
-        return 1 if failed or overall < args.fail_under else 0
-    except (OSError, RuntimeError, subprocess.CalledProcessError) as error:
+        return 1 if failed or failed_units or overall < args.fail_under else 0
+    except (OSError, RuntimeError, subprocess.CalledProcessError,
+            subprocess.TimeoutExpired) as error:
         print(f"coverage_callgrind.py: {error}", file=sys.stderr)
         return 1
 
