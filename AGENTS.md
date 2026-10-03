@@ -6,6 +6,15 @@ ALWAYS ASK IF UNSURE!
 comply. This file is the operational layer for non-human contributors: the
 concrete checks and procedures, not a restatement of the rules.
 
+## Check tiers
+
+The host-native FPC build is the daily driver: compile, conformance,
+unit-test, scenario, and coverage checks all run against it, and its
+results are enough to keep working. Genuine-TP7 compilation and the
+DOSEMU2 original-versus-TP7 runtime smoke checks are reserved for final
+checks: run them before pushing a milestone or in CI, not as part of
+every task.
+
 ## Language
 
 Always use English for communication. Tolerate input in other languages, but
