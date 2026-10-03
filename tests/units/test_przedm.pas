@@ -1,9 +1,9 @@
 program test_przedm;
-{Unit tests for PRZEDM: the deterministic, terminal-free
-procedures (state machines, stat arithmetic, item
-handling). Each test sets up the PRZEDM globals it
-reads, so the tests are order-independent and safe to
-run one per process.}
+{Unit tests for PRZEDM: the deterministic procedures
+(state machines, stat arithmetic, item handling,
+combat stat arithmetic). Each test sets up the
+PRZEDM globals it reads, so the tests are
+order-independent and safe to run one per process.}
 uses pastest, MONSTRA, PRZEDM;
 
 procedure TestMode;
@@ -177,6 +177,394 @@ begin
   CheckEqual(0, WPYSK, 'TARCZA clamps WPYSK at zero');
 end;
 
+{ WALKA: the pre-loop MINIKUNSZT arithmetic (PRZEDM.PAS
+  612-693) and the victory adjustments (869-877) are
+  deterministic. A dead enemy (WROGEN = 0) makes the
+  combat loop run exactly one iteration and end in the
+  victory path, so KUNSZT after WALKA is the stat
+  arithmetic plus the one iteration bonus; the MAXE
+  pair is then driven by MONSTRA.MAXE alone. A live
+  enemy (MAXE behind) also ends in the victory path,
+  but the number of combat rounds depends on the
+  Random damage sequence, so those cases assert a
+  range. Cases with ZRE <> WROGZRE enter the dodge
+  blocks, whose Random-based dodges can skip the
+  per-iteration bonus, so they assert the arithmetic
+  plus zero or one bonus. The fukscroll stays zero:
+  a fukroll redraw window of one damage value can
+  loop forever (the original FUKSROLL = 590 design
+  hung until SIGKILL), so the tests never enable
+  it. }
+procedure WalkaSetup(aMaxE, aWrogE, aSil, aWrogSil,
+  aZre, aWrogZre, aPar, aKop: Integer);
+begin
+  ENERGIA := 100;
+  PAR := aPar;
+  KOP := aKop;
+  KOPM := 0;
+  KOPHP := 0;
+  MANA := 0;
+  FIREBALL := 0;
+  POISON := 0;
+  ILEPOI := 0;
+  ZWIEJ := 0;
+  WIMP := 0;
+  PASZOL := 0;
+  KUNSZT := 0;
+  FUKSROLL := 0;
+  PRO := 0;
+  ILOSC := 0;
+  MONSTRA.MAXE := aMaxE;
+  WROGEN := aWrogE;
+  SIL := aSil;
+  WROGSIL := aWrogSil;
+  ZRE := aZre;
+  WROGZRE := aWrogZre;
+end;
+
+procedure RunWalka(aMaxE, aWrogE, aSil, aWrogSil,
+  aZre, aWrogZre, aPar, aKop: Integer;
+  ExpectedKunszt: Longint; const What: string);
+begin
+  WalkaSetup(aMaxE, aWrogE, aSil, aWrogSil,
+    aZre, aWrogZre, aPar, aKop);
+  WALKA;
+  CheckEqual(ExpectedKunszt, KUNSZT, What);
+end;
+
+procedure RunWalkaRange(aMaxE, aWrogE, aSil, aWrogSil,
+  aZre, aWrogZre, aPar, aKop: Integer;
+  KunsztLo, KunsztHi: Longint; const What: string);
+begin
+  WalkaSetup(aMaxE, aWrogE, aSil, aWrogSil,
+    aZre, aWrogZre, aPar, aKop);
+  WALKA;
+  CheckRange(What, KUNSZT, KunsztLo, KunsztHi);
+end;
+
+procedure TestWalkaEqualStats;
+begin
+  RunWalka(0, 0, 1, 1, 10, 10, 0, 0, 34,
+    'WALKA equal stats credit 33 plus one iteration');
+end;
+
+procedure TestWalkaMaxePlusOne;
+begin
+  RunWalka(1, 0, 1, 1, 10, 10, 0, 0, 33,
+    'WALKA MAXE ahead by one credits 10+11+11+1');
+end;
+
+procedure TestWalkaMaxePlusThreeOverlap;
+begin
+  RunWalka(3, 0, 1, 1, 10, 10, 0, 0, 42,
+    'WALKA MAXE ahead by three overlaps the 10 and 9 bands');
+end;
+
+procedure TestWalkaMaxePlusFive;
+begin
+  RunWalka(5, 0, 1, 1, 10, 10, 0, 0, 32,
+    'WALKA MAXE ahead by five credits 9+11+11+1');
+end;
+
+procedure TestWalkaMaxePlusEleven;
+begin
+  RunWalka(11, 0, 1, 1, 10, 10, 0, 0, 30,
+    'WALKA MAXE ahead by eleven credits 7+11+11+1');
+end;
+
+procedure TestWalkaMaxePlusTwenty;
+begin
+  RunWalka(20, 0, 1, 1, 10, 10, 0, 0, 27,
+    'WALKA MAXE ahead by twenty credits 4+11+11+1');
+end;
+
+procedure TestWalkaMaxePlusTwentyNine;
+begin
+  RunWalka(29, 0, 1, 1, 10, 10, 0, 0, 24,
+    'WALKA MAXE ahead by twenty-nine credits 1+11+11+1');
+end;
+
+procedure TestWalkaMaxePlusThirtyOne;
+begin
+  RunWalka(31, 0, 1, 1, 10, 10, 0, 0, 23,
+    'WALKA MAXE ahead by thirty-one is past every band');
+end;
+
+procedure TestWalkaMaxeBandAdjustment;
+begin
+  RunWalka(76, 0, 1, 1, 10, 10, 0, 0, 21,
+    'WALKA victory with MAXE 76 loses two KUNSZT');
+end;
+
+procedure TestWalkaMaxeHugeAdjustment;
+begin
+  RunWalka(116, 0, 1, 1, 10, 10, 0, 0, 18,
+    'WALKA victory with MAXE 116 loses five KUNSZT');
+end;
+
+procedure TestWalkaMaxeMinusTwo;
+begin
+  RunWalkaRange(0, 2, 61, 1, 10, 10, 0, 0, 24, 26,
+    'WALKA MAXE behind by two credits 12+0+11 plus rounds');
+end;
+
+procedure TestWalkaMaxeMinusTen;
+begin
+  RunWalkaRange(0, 10, 61, 1, 10, 10, 0, 0, 28, 31,
+    'WALKA MAXE behind by ten credits 16+0+11 plus rounds');
+end;
+
+procedure TestWalkaMaxeMinusTwentyOne;
+begin
+  RunWalkaRange(0, 21, 61, 1, 10, 10, 0, 0, 33, 36,
+    'WALKA MAXE behind by twenty-one credits 21+0+11 plus rounds');
+end;
+
+procedure TestWalkaSilPlusOne;
+begin
+  RunWalka(0, 0, 11, 10, 10, 10, 0, 0, 33,
+    'WALKA SIL ahead by one credits 11+10+11+1');
+end;
+
+procedure TestWalkaSilPlusTen;
+begin
+  RunWalka(0, 0, 20, 10, 10, 10, 0, 0, 24,
+    'WALKA SIL ahead by ten credits 11+1+11+1');
+end;
+
+procedure TestWalkaSilMinusOne;
+begin
+  RunWalka(0, 0, 9, 10, 10, 10, 0, 0, 35,
+    'WALKA SIL behind by one credits 11+12+11+1');
+end;
+
+procedure TestWalkaSilMinusTen;
+begin
+  RunWalka(0, 0, 1, 11, 10, 10, 0, 0, 44,
+    'WALKA SIL behind by ten credits 11+21+11+1');
+end;
+
+procedure TestWalkaParAdjustments;
+begin
+  RunWalka(0, 0, 1, 1, 10, 10, 96, 0, 29,
+    'WALKA victory with PAR 96 loses five KUNSZT');
+end;
+
+procedure TestWalkaKopAdjustments;
+begin
+  RunWalka(0, 0, 1, 1, 10, 10, 0, 96, 27,
+    'WALKA victory with KOP 96 loses seven KUNSZT');
+end;
+
+procedure TestWalkaZrePlusOne;
+begin
+  RunWalkaRange(0, 0, 1, 1, 11, 10, 0, 0, 32, 33,
+    'WALKA ZRE ahead by one credits 11+11+10 plus zero or one');
+end;
+
+procedure TestWalkaZrePlusTwelve;
+begin
+  RunWalkaRange(0, 0, 1, 1, 22, 10, 0, 0, 27, 28,
+    'WALKA ZRE ahead by twelve credits 11+11+5 plus zero or one');
+end;
+
+procedure TestWalkaZreMinusOne;
+begin
+  RunWalkaRange(0, 0, 1, 1, 9, 10, 0, 0, 34, 35,
+    'WALKA ZRE behind by one credits 11+11+12 plus zero or one');
+end;
+
+procedure TestWalkaZreMinusTwelve;
+begin
+  RunWalkaRange(0, 0, 1, 1, 1, 13, 0, 0, 39, 40,
+    'WALKA ZRE behind by twelve credits 11+11+17 plus zero or one');
+end;
+
+{ WALKA special moves. The helper zeroes the combat stats,
+  so the tests that need a special stat set it again after
+  the setup call. }
+
+procedure TestWalkaPoisoned;
+begin
+  WalkaSetup(0, 0, 1, 1, 10, 10, 0, 0);
+  ILEPOI := 10;
+  WALKA;
+  CheckTrue(WROGEN < 1, 'WALKA defeats the enemy while poisoned');
+  CheckTrue(ENERGIA > 0, 'WALKA survives the poison damage');
+end;
+
+procedure TestWalkaFireball;
+begin
+  WalkaSetup(0, 0, 1, 1, 10, 10, 0, 0);
+  FIREBALL := 1;
+  WALKA;
+  CheckTrue(WROGEN < 1, 'WALKA defeats the enemy under fireball');
+  CheckTrue((FIREBALL = 0) or (FIREBALL = 1),
+    'WALKA spends the fireball or keeps it');
+end;
+
+procedure TestWalkaPoison;
+begin
+  WalkaSetup(0, 0, 1, 1, 10, 10, 0, 0);
+  POISON := 1;
+  WALKA;
+  CheckTrue(WROGEN < 1, 'WALKA defeats the enemy under poison');
+  CheckTrue((POISON = 0) or (POISON = 1),
+    'WALKA spends the poison or keeps it');
+end;
+
+procedure TestWalkaParry;
+begin
+  WalkaSetup(0, 0, 1, 20, 10, 10, 139, 0);
+  WALKA;
+  CheckTrue(WROGEN < 1, 'WALKA defeats the enemy through parry');
+  CheckTrue(ENERGIA > 0, 'WALKA survives the parried attack');
+end;
+
+procedure TestWalkaParryLight;
+begin
+  WalkaSetup(0, 10, 3, 3, 10, 10, 139, 0);
+  ENERGIA := 10000;
+  WALKA;
+  CheckTrue(WROGEN < 1, 'WALKA defeats the enemy through light parry');
+  CheckTrue(ENERGIA > 0, 'WALKA survives the light parry');
+end;
+
+procedure TestWalkaSpecials;
+begin
+  WalkaSetup(0, 20, 3, 20, 10, 10, 139, 0);
+  ENERGIA := 10000;
+  FIREBALL := 1;
+  POISON := 1;
+  ILEPOI := 10;
+  WALKA;
+  CheckTrue(WROGEN < 1, 'WALKA defeats the enemy in the long fight');
+  CheckTrue(ENERGIA > 0, 'WALKA survives the long fight');
+end;
+
+procedure TestWalkaSuperKopHit;
+begin
+  WalkaSetup(0, 0, 1, 1, 10, 10, 0, 100);
+  MANA := 100; KOPHP := 100; ENERGIA := 50;
+  WALKA;
+  CheckTrue(WROGEN < 1, 'WALKA defeats the enemy with the super kop');
+  CheckTrue(MANA < 100, 'WALKA spends mana on the super kop');
+end;
+
+procedure TestWalkaSuperKopHitAgain;
+begin
+  WalkaSetup(0, 0, 1, 1, 10, 10, 0, 100);
+  MANA := 100; KOPHP := 100; ENERGIA := 50;
+  WALKA;
+  CheckTrue(WROGEN < 1, 'WALKA defeats the enemy with the kop again');
+  CheckTrue(MANA < 100, 'WALKA spends mana on the kop again');
+end;
+
+procedure TestWalkaSuperKopChybia;
+begin
+  WalkaSetup(0, 0, 1, 1, 10, 10, 0, 11);
+  MANA := 100; KOPHP := 100; ENERGIA := 50;
+  WALKA;
+  CheckTrue(WROGEN < 1, 'WALKA defeats the enemy when the kop misses');
+  CheckTrue(MANA < 100, 'WALKA spends mana on the kop attempt');
+end;
+
+procedure TestWalkaFlee;
+begin
+  WalkaSetup(0, 0, 1, 1, 10, 10, 0, 0);
+  ZWIEJ := 100; WIMP := 100; ENERGIA := 50; MANA := 100;
+  WALKA;
+  CheckTrue(PASZOL = 1, 'WALKA flees the battle');
+end;
+
+procedure TestWalkaFleeChybia;
+begin
+  WalkaSetup(0, 0, 1, 1, 10, 10, 0, 0);
+  ZWIEJ := 1; WIMP := 100; ENERGIA := 50; MANA := 100;
+  WALKA;
+  CheckTrue(WROGEN < 1,
+    'WALKA finishes the enemy when the flee fails');
+end;
+
+procedure TestWalkaPotrawki;
+begin
+  WalkaSetup(0, 0, 1, 1, 10, 10, 0, 0);
+  POTRAWKI := 99; BIGOS := 50; PRZED := 0;
+  WALKA;
+  CheckTrue(WROGEN < 1, 'WALKA defeats the enemy for the potrawki');
+  CheckTrue((PRZED = 0) or (PRZED = 1),
+    'WALKA cooks the bigos or not');
+end;
+
+procedure TestWalkaDeath;
+begin
+  WalkaSetup(0, 0, 1, 61, 10, 10, 0, 0);
+  ENERGIA := 1;
+  WALKA;
+  CheckTrue((ENERGIA < 1) or (WROGEN < 1),
+    'WALKA ends the fight by death or victory');
+end;
+
+procedure TestWalkaFukroll;
+begin
+  WalkaSetup(0, 10, 2, 1, 10, 10, 0, 0);
+  FUKSROLL := 1;
+  WALKA;
+  CheckTrue(WROGEN < 1,
+    'WALKA defeats the enemy through the fukroll');
+end;
+
+procedure EncounterSetup;
+begin
+  WalkaSetup(127, 0, 127, 1, 127, 1, 0, 0);
+  MTARCZA := 0; POTRAWKI := 0; FIREBALL := 0; POISON := 0;
+  ILEPOI := 0; SERCE := 0;
+end;
+
+procedure TestEncounters;
+begin
+  EncounterSetup;
+  wpisz := 'ZABIJ MROWKA';
+  SLABO;
+  CheckTrue(WROGEN < 1, 'SLABO defeats the mrowka');
+  EncounterSetup;
+  WALKAPIES;
+  CheckTrue(WROGEN < 1, 'WALKAPIES defeats the pies');
+  EncounterSetup;
+  MNIEJSLABO;
+  CheckTrue(WROGEN < 1, 'MNIEJSLABO defeats the enemy');
+  EncounterSetup;
+  SREDNIO;
+  CheckTrue(WROGEN < 1, 'SREDNIO defeats the enemy');
+  EncounterSetup;
+  TRUDNO;
+  CheckTrue(WROGEN < 1, 'TRUDNO defeats the enemy');
+  EncounterSetup;
+  VEASY;
+  CheckTrue((WROGEN < 1) and (ENERGIA > 0),
+    'VEASY defeats the enemy and survives');
+  EncounterSetup;
+  EASY;
+  CheckTrue((WROGEN < 1) and (ENERGIA > 0),
+    'EASY defeats the enemy and survives');
+  EncounterSetup;
+  NEASY;
+  CheckTrue((WROGEN < 1) and (ENERGIA > 0),
+    'NEASY defeats the enemy and survives');
+  EncounterSetup;
+  BTRUDNO;
+  CheckTrue(WROGEN < 1, 'BTRUDNO defeats the enemy');
+end;
+
+procedure TestWalkaDodge;
+begin
+  WalkaSetup(0, 30, 3, 1, 0, 2, 0, 0);
+  ENERGIA := 100;
+  WALKA;
+  CheckTrue(WROGEN < 1, 'WALKA defeats the dodging enemy');
+  CheckTrue(ENERGIA > 0, 'WALKA survives the dodged combat');
+end;
+
 procedure TestBraniePicksUpSword;
 begin
   MIECHO2 := 7; MMIECZ := 7; PRZED := 0; wpisz := 'BIERZ STARY';
@@ -301,6 +689,100 @@ begin
   CheckEqual(-10, DYPLOM, 'UZYJ DYPLOM keeps the diploma');
 end;
 
+procedure TestUzywaPaczek;
+begin
+  PACZEK := -10; ENERGIA := 10; MONSTRA.MAXE := 50; PRZED := 1;
+  wpisz := 'UZYJ PACZEK';
+  UZYWANIE;
+  CheckEqual(0, PACZEK, 'UZYJ PACZEK consumes the paczek');
+  CheckEqual(18, ENERGIA, 'UZYJ PACZEK restores eight energy');
+  CheckEqual(0, PRZED, 'UZYJ PACZEK uncounts the item');
+end;
+
+procedure TestUzywaCiastko;
+begin
+  CIASTKO := -10; ENERGIA := 10; MONSTRA.MAXE := 50; PRZED := 1;
+  wpisz := 'UZYJ CIASTKO';
+  UZYWANIE;
+  CheckEqual(0, CIASTKO, 'UZYJ CIASTKO consumes the ciastko');
+  CheckEqual(22, ENERGIA, 'UZYJ CIASTKO restores twelve energy');
+end;
+
+procedure TestUzywaSuchaRacja;
+begin
+  SUCHA := -10; ENERGIA := 10; MONSTRA.MAXE := 50; PRZED := 1;
+  wpisz := 'UZYJ SUCHA RACJA';
+  UZYWANIE;
+  CheckEqual(0, SUCHA, 'UZYJ SUCHA RACJA consumes the racja');
+  CheckEqual(26, ENERGIA, 'UZYJ SUCHA RACJA restores sixteen energy');
+end;
+
+procedure TestUzywaBulka;
+begin
+  BULKA := -10; ENERGIA := 10; MONSTRA.MAXE := 50; PRZED := 1;
+  wpisz := 'UZYJ BULKA';
+  UZYWANIE;
+  CheckEqual(0, BULKA, 'UZYJ BULKA consumes the bulka');
+  CheckEqual(30, ENERGIA, 'UZYJ BULKA restores twenty energy');
+end;
+
+procedure TestUzywaChleb;
+begin
+  CHLEB := -10; ENERGIA := 10; MONSTRA.MAXE := 50; PRZED := 1;
+  wpisz := 'UZYJ CHLEB';
+  UZYWANIE;
+  CheckEqual(0, CHLEB, 'UZYJ CHLEB consumes the chleb');
+  CheckEqual(36, ENERGIA, 'UZYJ CHLEB restores twenty-six energy');
+end;
+
+procedure TestUzyjaWeka;
+begin
+  WEKA := -10; ENERGIA := 10; MONSTRA.MAXE := 50; PRZED := 1;
+  wpisz := 'UZYJ WEKA';
+  UZYWANIE;
+  CheckEqual(0, WEKA, 'UZYJ WEKA consumes the weka');
+  CheckEqual(44, ENERGIA, 'UZYJ WEKA restores thirty-four energy');
+end;
+
+procedure TestUzywaBigos;
+begin
+  BIGOS := -10; ENERGIA := 10; MONSTRA.MAXE := 50; PRZED := 1;
+  wpisz := 'UZYJ BIGOS';
+  UZYWANIE;
+  CheckEqual(0, BIGOS, 'UZYJ BIGOS consumes the bigos');
+  CheckEqual(30, ENERGIA, 'UZYJ BIGOS restores twenty energy');
+end;
+
+procedure TestUzywaPigulkaLow;
+begin
+  PIGULKA := -10; MAD := 5; MONSTRA.MAXE := 50; ENERGIA := 40; KUNSZT := 100;
+  wpisz := 'UZYJ PIGULKA';
+  UZYWANIE;
+  CheckEqual(0, PIGULKA, 'UZYJ PIGULKA consumes the pigulka');
+  CheckEqual(1, ENERGIA, 'UZYJ PIGULKA with low MAD drains energy to one');
+  CheckEqual(49, MONSTRA.MAXE, 'UZYJ PIGULKA with low MAD lowers max energy');
+  CheckEqual(50, KUNSZT, 'UZYJ PIGULKA with low MAD lowers kunszt');
+end;
+
+procedure TestUzywaPigulkaMid;
+begin
+  PIGULKA := -10; MAD := 12; ENERGIA := 100; KUNSZT := 100;
+  wpisz := 'UZYJ PIGULKA';
+  UZYWANIE;
+  CheckEqual(60, ENERGIA, 'UZYJ PIGULKA with mid MAD drains forty energy');
+  CheckEqual(70, KUNSZT, 'UZYJ PIGULKA with mid MAD lowers kunszt');
+end;
+
+procedure TestUzywaPigulkaHigh;
+begin
+  PIGULKA := -10; MAD := 20; ENERGIA := 100; KUNSZT := 100;
+  wpisz := 'UZYJ PIGULKA';
+  UZYWANIE;
+  CheckEqual(0, PIGULKA, 'UZYJ PIGULKA with high MAD consumes the pigulka');
+  CheckEqual(100, ENERGIA, 'UZYJ PIGULKA with high MAD keeps energy');
+  CheckEqual(100, KUNSZT, 'UZYJ PIGULKA with high MAD keeps kunszt');
+end;
+
 procedure TestGarniturZyskInvariant;
 begin
   GARNITUR := 50; PRZED := 0;
@@ -358,6 +840,87 @@ begin
     'SCROLLPORZYSK drops the scroll by ten or not at all');
   CheckTrue((PRZED = 0) or (PRZED = 1),
     'SCROLLPORZYSK counts at most one item');
+end;
+
+{ The rare-gain branches of the loot procedures only
+  trigger on a low Random roll, so the tests repeat
+  the procedure until the first gain, which makes the
+  result a single deterministic gain. }
+
+procedure TestGarniturZyskGain;
+var i: Integer;
+begin
+  GARNITUR := 100; PRZED := 0;
+  i := 0;
+  while (PRZED = 0) and (i < 2000) do begin
+    GARNITURZYSK;
+    i := i + 1;
+  end;
+  CheckTrue(PRZED > 0, 'GARNITURZYSK gains the suit');
+  CheckEqual(90, GARNITUR,
+    'GARNITURZYSK drops GARNITUR by ten');
+end;
+
+procedure TestPigulkaZyskGain;
+var i: Integer;
+begin
+  PIGULKA := 100; PRZED := 0;
+  i := 0;
+  while (PRZED = 0) and (i < 2000) do begin
+    PIGULKAZYSK;
+    i := i + 1;
+  end;
+  CheckTrue(PRZED > 0, 'PIGULKAZYSK gains the pill');
+  CheckEqual(90, PIGULKA,
+    'PIGULKAZYSK drops PIGULKA by ten');
+end;
+
+procedure TestKasetaZyskGain;
+var i: Integer;
+begin
+  kaseta := 100; MAXE := 0; PRO := 0; PRZED := 0;
+  ZRE := 0; MIECHO := 20;
+  i := 0;
+  while (PRZED = 0) and (i < 2000) do begin
+    KASETAZYSK;
+    i := i + 1;
+  end;
+  CheckTrue(PRZED > 0, 'KASETAZYSK gains the cassette');
+  CheckEqual(90, kaseta,
+    'KASETAZYSK drops the cassette by ten');
+  CheckEqual(5, MAXE, 'KASETAZYSK raises MAXE by five');
+  CheckEqual(-8, PRO, 'KASETAZYSK lowers PRO by eight');
+  CheckEqual(1, ZRE, 'KASETAZYSK raises ZRE by one');
+end;
+
+procedure TestListekZyskGain;
+var i: Integer;
+begin
+  LISTEK := 100; PRZED := 0; MAXMANA := 0; MIECHO := 20;
+  i := 0;
+  while (PRZED = 0) and (i < 2000) do begin
+    LISTEKZYSK;
+    i := i + 1;
+  end;
+  CheckTrue(PRZED > 0, 'LISTEKZYSK gains the leaf');
+  CheckEqual(90, LISTEK,
+    'LISTEKZYSK drops the leaf by ten');
+  CheckEqual(40, MAXMANA,
+    'LISTEKZYSK raises MAXMANA by forty');
+end;
+
+procedure TestScrollPorZyskGain;
+var i: Integer;
+begin
+  SCROLLPOR := 100; PRZED := 0; MIECHO := 20;
+  i := 0;
+  while (PRZED = 0) and (i < 2000) do begin
+    SCROLLPORZYSK;
+    i := i + 1;
+  end;
+  CheckTrue(PRZED > 0, 'SCROLLPORZYSK gains the scroll');
+  CheckEqual(90, SCROLLPOR,
+    'SCROLLPORZYSK drops the scroll by ten');
 end;
 
 procedure TestScenaMessages;
@@ -423,6 +986,53 @@ begin
   RegisterTest('potwory-ranges', TestPotworyRanges);
   RegisterTest('tarcza-shield', TestTarczaAppliesShield);
   RegisterTest('tarcza-clamp', TestTarczaClampsAtZero);
+  RegisterTest('walka-equal-stats', TestWalkaEqualStats);
+  RegisterTest('walka-maxe-plus-one', TestWalkaMaxePlusOne);
+  RegisterTest('walka-maxe-plus-three-overlap',
+    TestWalkaMaxePlusThreeOverlap);
+  RegisterTest('walka-maxe-plus-five', TestWalkaMaxePlusFive);
+  RegisterTest('walka-maxe-plus-eleven', TestWalkaMaxePlusEleven);
+  RegisterTest('walka-maxe-plus-twenty', TestWalkaMaxePlusTwenty);
+  RegisterTest('walka-maxe-plus-twenty-nine',
+    TestWalkaMaxePlusTwentyNine);
+  RegisterTest('walka-maxe-plus-thirty-one',
+    TestWalkaMaxePlusThirtyOne);
+  RegisterTest('walka-maxe-band-adjustment',
+    TestWalkaMaxeBandAdjustment);
+  RegisterTest('walka-maxe-huge-adjustment',
+    TestWalkaMaxeHugeAdjustment);
+  RegisterTest('walka-maxe-minus-two', TestWalkaMaxeMinusTwo);
+  RegisterTest('walka-maxe-minus-ten', TestWalkaMaxeMinusTen);
+  RegisterTest('walka-maxe-minus-twenty-one',
+    TestWalkaMaxeMinusTwentyOne);
+  RegisterTest('walka-sil-plus-one', TestWalkaSilPlusOne);
+  RegisterTest('walka-sil-plus-ten', TestWalkaSilPlusTen);
+  RegisterTest('walka-sil-minus-one', TestWalkaSilMinusOne);
+  RegisterTest('walka-sil-minus-ten', TestWalkaSilMinusTen);
+  RegisterTest('walka-par-adjustments', TestWalkaParAdjustments);
+  RegisterTest('walka-kop-adjustments', TestWalkaKopAdjustments);
+  RegisterTest('walka-zre-plus-one', TestWalkaZrePlusOne);
+  RegisterTest('walka-zre-plus-twelve', TestWalkaZrePlusTwelve);
+  RegisterTest('walka-zre-minus-one', TestWalkaZreMinusOne);
+  RegisterTest('walka-zre-minus-twelve', TestWalkaZreMinusTwelve);
+  RegisterTest('walka-poisoned', TestWalkaPoisoned);
+  RegisterTest('walka-fireball', TestWalkaFireball);
+  RegisterTest('walka-poison', TestWalkaPoison);
+  RegisterTest('walka-parry', TestWalkaParry);
+  RegisterTest('walka-parry-light', TestWalkaParryLight);
+  RegisterTest('walka-specials', TestWalkaSpecials);
+  RegisterTest('walka-super-kop-hit', TestWalkaSuperKopHit);
+  RegisterTest('walka-super-kop-hit-again',
+    TestWalkaSuperKopHitAgain);
+  RegisterTest('walka-super-kop-chybia',
+    TestWalkaSuperKopChybia);
+  RegisterTest('walka-flee', TestWalkaFlee);
+  RegisterTest('walka-flee-chybia', TestWalkaFleeChybia);
+  RegisterTest('walka-potrawki', TestWalkaPotrawki);
+  RegisterTest('walka-death', TestWalkaDeath);
+  RegisterTest('walka-fukroll', TestWalkaFukroll);
+  RegisterTest('walka-dodge', TestWalkaDodge);
+  RegisterTest('encounters', TestEncounters);
   RegisterTest('branie-pickup', TestBraniePicksUpSword);
   RegisterTest('branie-drop', TestBranieDropsSword);
   RegisterTest('branie-ignores-missing', TestBranieIgnoresMissingSword);
@@ -437,11 +1047,27 @@ begin
   RegisterTest('niszczy-przepustke', TestNiszczyPrzepustke);
   RegisterTest('patrz-przepustke', TestPatrzPrzepustke);
   RegisterTest('uzywa-dyplom', TestUzywaDyplom);
+  RegisterTest('uzywa-paczek', TestUzywaPaczek);
+  RegisterTest('uzywa-ciastko', TestUzywaCiastko);
+  RegisterTest('uzywa-sucha-racja', TestUzywaSuchaRacja);
+  RegisterTest('uzywa-bulka', TestUzywaBulka);
+  RegisterTest('uzywa-chleb', TestUzywaChleb);
+  RegisterTest('uzyja-weka', TestUzyjaWeka);
+  RegisterTest('uzywa-bigos', TestUzywaBigos);
+  RegisterTest('uzywa-pigulka-low', TestUzywaPigulkaLow);
+  RegisterTest('uzywa-pigulka-mid', TestUzywaPigulkaMid);
+  RegisterTest('uzywa-pigulka-high', TestUzywaPigulkaHigh);
   RegisterTest('zysk-garnitur', TestGarniturZyskInvariant);
   RegisterTest('zysk-pigulka', TestPigulkaZyskInvariant);
   RegisterTest('zysk-kaseta', TestKasetaZyskInvariant);
   RegisterTest('zysk-listek', TestListekZyskInvariant);
   RegisterTest('zysk-scrollpor', TestScrollPorZyskInvariant);
+  RegisterTest('zysk-garnitur-gain', TestGarniturZyskGain);
+  RegisterTest('zysk-pigulka-gain', TestPigulkaZyskGain);
+  RegisterTest('zysk-kaseta-gain', TestKasetaZyskGain);
+  RegisterTest('zysk-listek-gain', TestListekZyskGain);
+  RegisterTest('zysk-scrollpor-gain',
+    TestScrollPorZyskGain);
   RegisterTest('scena-messages', TestScenaMessages);
   RegisterTest('tlum-messages', TestTlumMessages);
   RegisterTest('kto-messages', TestKtoMessages);

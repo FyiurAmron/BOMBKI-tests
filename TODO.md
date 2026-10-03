@@ -5,7 +5,7 @@ This file lists only remaining work.
 ## Remaining work
 
 1. **Coverage growth**: raise total FPC line coverage from the
-   33.75% level (nine passing scenario runs plus the Pascal unit
+   45.67% level (nine passing scenario runs plus the Pascal unit
    tests) toward the 100% goal, guided by the
    uncovered-lines report of
    `python3 tools/coverage_callgrind.py`; add scenarios for the
@@ -16,16 +16,22 @@ This file lists only remaining work.
 
 2. **Pascal unit tests**: `tests/units` holds the plain-Pascal
    test framework (`pastest.pas`) and the first test program
-   (`test_przedm.pas`, 33 tests: MODE, KOMENDY, TRAIN,
+   (`test_przedm.pas`, 87 tests: MODE, KOMENDY, TRAIN,
    POTWORY ranges, TARCZA, BRANIE, UZYWANIE item round-trips,
-   drop-item invariants, scene messages), built and run
-   host-native by `tests/run_unit_tests.py` and merged into
-   the Callgrind coverage (PRZEDM.PAS 170 -> 340 lines).
-   Next: WALKA's deterministic stat arithmetic, the SWIAT
-   room procedures (they read commands from stdin, so the
-   runner must pipe input), MONSTRA.WSTEP (waits for a
-   keypress), and running the same test sources under
-   genuine TP7 in DOSEMU2.
+   drop-item invariants, scene messages, WALKA stat arithmetic,
+   WALKA special moves (parry, fireball, poison, poison
+   damage over time, super kop, flee, potrawki, death, fukroll
+   redraw, dodges), the encounter procedures (SLABO through
+   BTRUDNO), and the rare-gain branches of the loot
+   procedures), built and run host-native by
+   `tests/run_unit_tests.py` and merged into the Callgrind
+   coverage (PRZEDM.PAS 170 -> 794 lines). Next: the SWIAT room
+   procedures (they read commands from stdin, so the runner
+   must pipe input), the remaining PRZEDM procedures (POROWNANIE,
+   SMIERC, PIERDOLY, MINIARENA, FIGHTSCENA, FIGHTBLUSZCZ -
+   these read commands from stdin), MONSTRA.WSTEP (waits for a
+   keypress), and running the same test sources under genuine
+   TP7 in DOSEMU2.
 
 ## Completed
 
