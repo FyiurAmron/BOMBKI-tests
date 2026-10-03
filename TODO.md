@@ -8,17 +8,17 @@ This file lists only remaining work.
    checks, including MODE status/item output, commands, sleep,
    and save/load. DOSEMU2 is suitable for those behavior checks; DOSBox-X
    is for TP7 compilation and top-level testing. Host-native FPC results
-   are not DOS behavior evidence. The startup-hint wait step (as in
-   mode-smoke) is now in every scenario; six of nine pass. The three
-   remaining expectation mismatches need ground-truth checks against
-   the original game: garden-dispatch-smoke (no ZYSKALES practice-gain
-   messages at startup), mode-save-load-smoke (load flow passes the
-   `suckemall:` prompt at BOMBKI.PAS:1370 before the money report),
-   poster-reward-smoke (GORA from the cage hall returns to the round
-   salon, not the poster room).
+   are not DOS behavior evidence. All nine scenarios now pass natively.
+   The three written against early experimental recon versions were
+   corrected to the current PAS/EXE behavior: startup prints no ZYSKALES
+   practice-gain messages (those live in ZdobadzPoziom, the level-up
+   path), the load flow consumes one input line at BOMBKI.PAS:1278
+   before the `suckemall:` prompt at BOMBKI.PAS:1370, and the poster
+   room is reached via rooms 1-4-5-9-11-17 (GORA from room 3 returns
+   to room 1, not to the cage hall).
 
 2. **Coverage growth**: raise total FPC line coverage from the
-   28.45% level (nine scenario runs plus the Pascal unit
+   33.75% level (nine passing scenario runs plus the Pascal unit
    tests) toward the 100% goal, guided by the
    uncovered-lines report of
    `python3 tools/coverage_callgrind.py`; add scenarios for the

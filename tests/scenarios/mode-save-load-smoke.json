@@ -51,8 +51,13 @@
       "send": "WLACZ POSTAC"
     },
     {
-      "label": "prompt after load",
-      "expect": "[0-9]+%\\.-?[0-9]+>",
+      "label": "load command echo",
+      "expect": "WLACZ POSTAC",
+      "send": "JA"
+    },
+    {
+      "label": "load confirmation prompt",
+      "expect": "suckemall:",
       "send": "JA"
     },
     {
