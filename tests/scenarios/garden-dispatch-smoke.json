@@ -16,6 +16,11 @@
       "send": "TESTER"
     },
     {
+      "label": "startup key read",
+      "expect": "ABY SIE PATRZEC UZYJ KOMENDY PATRZ",
+      "send": ""
+    },
+    {
       "label": "starting room",
       "expect": "ZYSKALES [0-9]+ PRAKTYK[\\s\\S]*?ZYSKALES [0-9]+ MAXIMUM ENERGI[\\s\\S]*?ZYSKALES [0-9]+MANY[\\s\\S]*?TU ZACZYNA SIE GRE",
       "send": "POLNOC"

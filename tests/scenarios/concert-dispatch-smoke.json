@@ -16,6 +16,11 @@
       "send": "TESTER"
     },
     {
+      "label": "startup key read",
+      "expect": "ABY SIE PATRZEC UZYJ KOMENDY PATRZ",
+      "send": ""
+    },
+    {
       "label": "intro complete",
       "expect": "TU ZACZYNA SIE GRE",
       "send": "POLNOC"
