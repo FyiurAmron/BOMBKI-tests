@@ -81,7 +81,7 @@ The unit tests under `tests/units` are plain Pascal programs
 that use the reconstructed units directly, so they can assert
 on unit internals (global state, deterministic procedures)
 that the PTY scenarios only observe through the game's
-terminal output. The framework `tests/units/bkitest.pas` is
+terminal output. The framework `tests/units/pastest.pas` is
 plain TP-compatible Pascal, so the same test sources can later
 compile with genuine TP7. The runner builds them with FPC
 `-Mtp` and executes every test in a fresh process, because

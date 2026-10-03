@@ -1,4 +1,4 @@
-unit bkitest;
+unit pastest;
 {Minimal unit-test framework for the BOMBKI reconstruction.
 
 Plain TP-compatible Pascal so the same test sources compile
@@ -44,7 +44,7 @@ end;
 procedure RegisterTest(const name: string; proc: TTestProc);
 begin
   if TestCount >= MaxTests then begin
-    WriteLn('bkitest: too many tests (maximum ', MaxTests, ')');
+    WriteLn('pastest: too many tests (maximum ', MaxTests, ')');
     Halt(1);
   end;
   TestCount := TestCount + 1;

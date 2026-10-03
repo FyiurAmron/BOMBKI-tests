@@ -29,7 +29,7 @@ from pathlib import Path
 PROJECT = Path(__file__).resolve().parents[1]
 SOURCES = PROJECT / "_reconstructed"
 UNIT_TESTS = PROJECT / "tests" / "units"
-FRAMEWORK = "bkitest"
+FRAMEWORK = "pastest"
 UNIT_NAMES = ("MONSTRA", "PRZEDM", "SWIAT")
 BUILD_DIR = PROJECT / "build" / "tmp" / "unit-tests"
 

@@ -15,7 +15,7 @@ This file lists only remaining work.
    coverage reaches 100%.
 
 2. **Pascal unit tests**: `tests/units` holds the plain-Pascal
-   test framework (`bkitest.pas`) and the first test program
+   test framework (`pastest.pas`) and the first test program
    (`test_przedm.pas`, 33 tests: MODE, KOMENDY, TRAIN,
    POTWORY ranges, TARCZA, BRANIE, UZYWANIE item round-trips,
    drop-item invariants, scene messages), built and run

@@ -4,7 +4,7 @@ procedures (state machines, stat arithmetic, item
 handling). Each test sets up the PRZEDM globals it
 reads, so the tests are order-independent and safe to
 run one per process.}
-uses bkitest, MONSTRA, PRZEDM;
+uses pastest, MONSTRA, PRZEDM;
 
 procedure TestMode;
 begin

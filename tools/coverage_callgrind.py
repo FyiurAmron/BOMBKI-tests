@@ -114,7 +114,7 @@ def run_scenarios(wrapper: Path, out_dir: Path, timeout: float,
 def build_unit_tests(fpc: str, build_dir: Path) -> list[Path]:
     """Compile the framework and every tests/units program with -g."""
     build_dir.mkdir(parents=True, exist_ok=True)
-    sources = [UNIT_TEST_DIR / "bkitest.pas"]
+    sources = [UNIT_TEST_DIR / "pastest.pas"]
     sources.extend(SOURCES / f"{name}.PAS" for name in UNIT_NAMES)
     sources.extend(sorted(UNIT_TEST_DIR.glob("test_*.pas")))
     for source in sources:
