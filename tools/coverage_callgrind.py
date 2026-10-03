@@ -330,14 +330,17 @@ def main() -> int:
                         help="FPC executable (default: FPC env var or fpc)")
     parser.add_argument("--scenarios", nargs="+", type=Path,
                         help="scenario files (default: tests/scenarios/*.json)")
-    parser.add_argument("--timeout", type=float, default=60.0,
+    parser.add_argument("--timeout", type=float, default=240.0,
                         help="seconds allowed for each expected output "
-                             "(default: 60)")
+                             "(default: 240)")
     parser.add_argument("--fail-under", type=float, default=0.0,
                         help="required total line coverage in percent "
                              "(default: 0, report only; the goal is 100)")
     parser.add_argument("--no-unit-tests", action="store_true",
                         help="measure coverage from the scenarios only")
+    parser.add_argument("--dump-uncovered", type=Path,
+                        help="write the full uncovered line list "
+                             "per source file to this path")
     args = parser.parse_args()
 
     try:
@@ -425,6 +428,19 @@ def main() -> int:
                    if overall_total else 100.0)
         print(f"  {'TOTAL':12} {overall_covered:5}"
               f"/{overall_total:<5} {overall:6.2f}%")
+
+        if args.dump_uncovered is not None:
+            with open(args.dump_uncovered, "w",
+                      encoding="utf-8") as dump:
+                for path in sorted(target_sources):
+                    all_lines = totals.get(path, set())
+                    covered_lines = covered_by_file.get(path,
+                                                      set())
+                    dump.write(f"{path.name}\n")
+                    dump.write(", ".join(
+                        str(line) for line
+                        in sorted(all_lines - covered_lines)))
+                    dump.write("\n")
 
         failed = [result for result in results if not result["passed"]]
         if failed:

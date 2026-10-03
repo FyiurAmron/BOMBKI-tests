@@ -8,7 +8,8 @@ This file lists only remaining work.
    45.67% level (nine passing scenario runs plus the Pascal unit
    tests) toward the 100% goal, guided by the
    uncovered-lines report of
-   `python3 tools/coverage_callgrind.py`; add scenarios for the
+   `python3 tools/coverage_callgrind.py --dump-uncovered`;
+   add scenarios for the
    untested paths (combat, items, death, and the rest of the
    command set) and Pascal unit tests for the deterministic
    unit internals. Use `--fail-under 100` as the gate once

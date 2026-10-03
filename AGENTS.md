@@ -58,6 +58,17 @@ instead, except when reproducing a direct quotation verbatim.
 - Update `TODO.md` and the dated log as work is completed or priorities change.
 - Verify the worktree, then commit and push when the current task is complete.
 
+## Running tests
+
+- Test runners must explicitly emit the names of the
+  failed tests (not only a failure count), so a single
+  run shows exactly which tests broke and why.
+- Always redirect a test run's full output to a file
+  under `build/tmp/` and inspect that file (read or
+  grep it) to see the results and failures. Never
+  rerun a test suite merely to view its output; rerun
+  only to reproduce a failure after changing code.
+
 ## Autonomy
 
 Do not stop after completing an intermediate task. Continue autonomously with

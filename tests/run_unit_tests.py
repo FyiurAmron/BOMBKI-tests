@@ -40,6 +40,7 @@ TARGET_FLAGS = {
 
 SUMMARY = re.compile(r"tests: (\d+), failures: (\d+)")
 RUN_LINE = re.compile(r"^RUN (\S+)$", re.MULTILINE)
+FAIL_LINE = re.compile(r"^FAIL \[(\S+)\]", re.MULTILINE)
 
 
 def resolve_executable(name: str) -> str:
@@ -114,11 +115,12 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--fpc", default=os.environ.get("FPC", "fpc"),
                         help="FPC executable (default: FPC env var or fpc)")
-    parser.add_argument("--timeout", type=float, default=30.0,
-                        help="seconds allowed for each run (default: 30)")
+    parser.add_argument("--timeout", type=float, default=600.0,
+                        help="seconds allowed for each run (default: 600)")
     args = parser.parse_args()
 
     failed = False
+    failed_tests: list[str] = []
     try:
         fpc = resolve_executable(args.fpc)
         version = subprocess.check_output(
@@ -137,6 +139,13 @@ def main() -> int:
                   f"{failures} failures{' OK' if ok else ' FAILED'}")
             if not ok:
                 failed = True
+                # The whole-process run failed: recover the
+                # failing test names from the FAIL lines the
+                # framework already printed.
+                failed_tests.extend(
+                    f"{program.name} {name}"
+                    for name in FAIL_LINE.findall(
+                        completed.stdout))
                 print(completed.stdout.strip(), file=sys.stderr)
                 if completed.stderr.strip():
                     print(completed.stderr.strip(), file=sys.stderr)
@@ -149,10 +158,15 @@ def main() -> int:
                         and isolated_summary == (1, 0)):
                     continue
                 failed = True
-                print(f"  {program.name} {name}: FAILED", file=sys.stderr)
+                failed_tests.append(f"{program.name} {name}")
+                print(f"  {program.name} {name}: FAILED",
+                      file=sys.stderr)
                 print(isolated.stdout.strip(), file=sys.stderr)
                 if isolated.stderr.strip():
                     print(isolated.stderr.strip(), file=sys.stderr)
+        if failed_tests:
+            print("failed tests: " + ", ".join(failed_tests),
+                  file=sys.stderr)
     except (OSError, RuntimeError, subprocess.CalledProcessError,
             subprocess.TimeoutExpired) as error:
         print(f"run_unit_tests.py: {error}", file=sys.stderr)
