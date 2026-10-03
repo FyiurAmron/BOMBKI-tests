@@ -56,6 +56,19 @@ python3 tests/expect_pty.py build/fpc/BOMBKI-linux-x86_64 \
   --log build/pty-native/mode-smoke.jsonl
 ```
 
+Measure host-native FPC line coverage with Callgrind (all
+scenarios; requires `valgrind` and `readelf`):
+
+```sh
+python3 tools/coverage_callgrind.py
+```
+
+The report lists per-file covered/total lines with uncovered line
+numbers, summed over every scenario run; `--fail-under 100` gates a
+run on the 100% coverage goal. Coverage builds with DWARF info and
+profiles the host-native executable, so it is not DOS behavior
+evidence.
+
 Compile with genuine TP7 in DOSBox-X, without starting the game:
 
 ```sh

@@ -79,13 +79,23 @@ def main() -> int:
     pending = ""
     try:
         command = [str(executable), *scenario.get("args", [])]
-        record("START", command=command, scenario=str(scenario_path))
+        # The game writes its save file (pliki.tpu) into the working
+        # directory, so default to a per-scenario scratch dir under
+        # the ignored build/ directory instead of the caller's cwd.
+        working_directory = scenario.get("cwd")
+        if working_directory is None:
+            project_root = Path(__file__).resolve().parents[1]
+            working_directory = (project_root / "build" / "pty-native"
+                                 / scenario_path.stem)
+            working_directory.mkdir(parents=True, exist_ok=True)
+        record("START", command=command, scenario=str(scenario_path),
+               cwd=str(working_directory))
         environment = os.environ.copy()
         if args.pyte:
             environment["TERM"] = scenario.get("term", "xterm")
         process = subprocess.Popen(
             command, stdin=slave, stdout=slave, stderr=slave,
-            cwd=scenario.get("cwd"), env=environment, start_new_session=True,
+            cwd=working_directory, env=environment, start_new_session=True,
         )
         os.close(slave)
         slave = -1
