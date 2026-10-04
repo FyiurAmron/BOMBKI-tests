@@ -120,8 +120,8 @@ def run_program(program: Path, argument: str | None,
     command = [str(program)]
     if argument:
         command.append(argument)
-    return subprocess.run(command, capture_output=True, text=True,
-                          errors="replace", timeout=timeout)
+    return subprocess.run(command, cwd=PROJECT, capture_output=True,
+                          text=True, errors="replace", timeout=timeout)
 
 
 def parse_summary(stdout: str) -> tuple[int, int] | None:

@@ -173,7 +173,7 @@ def run_unit_programs(binaries: list[Path], out_dir: Path,
         environment["CG_OUT_FILE"] = str(profile)
         command = [str(wrapper)]
         print("+", subprocess.list2cmdline(command))
-        completed = subprocess.run(command, cwd=run_dir, env=environment,
+        completed = subprocess.run(command, cwd=PROJECT, env=environment,
                                    capture_output=True, text=True,
                                    errors="replace", timeout=timeout)
         summary = SUMMARY.search(completed.stdout)
