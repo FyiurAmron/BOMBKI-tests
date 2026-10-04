@@ -198,7 +198,7 @@ def main():
                              25: ["LISTA"], 26: ["LISTA"]}),
         # The concert hall: the street, the fun-fair valley, the
         # crowd block (rooms 61 to 72) and the arena approach.
-        "concert-tour.json": ([30, 31, 60, 61, 62, 63, 64, 65, 66, 67, 68,
+        "concert-tour.json": ([30, 31, 32, 60, 61, 62, 63, 64, 65, 66, 67, 68,
                                69, 70, 71, 72], {}),
         # The dark street and the cave behind it. Room 88 is the
         # twenty-times-bigger POKRZYWA boss: it fights on entry with

@@ -66,6 +66,46 @@
       "send": "EXIT"
     },
     {
+      "label": "room 31 exits -> 30",
+      "expect": "DOSTEPNE WYJSCI[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
+      "send": "WSCHOD"
+    },
+    {
+      "label": "room 30 (ULICA DLUGA CIAGNIE )",
+      "expect": "ULICA DLUGA CIAGNIE SIE W NIESKONCZONO[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
+      "send": "EXIT"
+    },
+    {
+      "label": "room 30 exits -> 32",
+      "expect": "DOSTEPNE WYJSCI[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
+      "send": "POLNOC"
+    },
+    {
+      "label": "room 32 (CZESC TO ARENA PRZYC)",
+      "expect": "CZESC TO ARENA PRZYCHODZA TU TACY JAK [\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
+      "send": "EXIT"
+    },
+    {
+      "label": "room 32 exits -> 30",
+      "expect": "DOSTEPNE WYJSCI[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
+      "send": "POLODNIE"
+    },
+    {
+      "label": "room 30 (ULICA DLUGA CIAGNIE )",
+      "expect": "ULICA DLUGA CIAGNIE SIE W NIESKONCZONO[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
+      "send": "EXIT"
+    },
+    {
+      "label": "room 30 exits -> 31",
+      "expect": "DOSTEPNE WYJSCI[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
+      "send": "ZACHOD"
+    },
+    {
+      "label": "room 31 (IDAC ULICA DLUGA NA )",
+      "expect": "IDAC ULICA DLUGA NA POLNOC SPOSTRZEGAS[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
+      "send": "EXIT"
+    },
+    {
       "label": "room 31 exits -> 60",
       "expect": "DOSTEPNE WYJSCI[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
       "send": "POLNOC"
