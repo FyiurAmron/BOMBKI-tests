@@ -129,7 +129,7 @@ def path(graph, frm, to):
     return legs
 
 
-def build(graph, texts, waypoints, extra=None):
+def build(graph, texts, waypoints, extra=None, race="POL-ELF"):
     """Build scenario steps: walk the waypoints, running each exit list."""
     extra = extra or {}
     seq = [(0, None), (1, "POLNOC")]
@@ -144,7 +144,7 @@ def build(graph, texts, waypoints, extra=None):
     steps = [
         {"label": "intro tick", "expect": "TICK !!!", "send": ""},
         {"label": "race prompt", "expect": "NAPISZ SWA RASE",
-         "send": "POL-ELF"},
+         "send": race},
         {"label": "player-name prompt", "expect": "PODAJE SWE IMIE",
          "send": "TESTER"},
         {"label": "startup key read",
@@ -181,6 +181,7 @@ def build(graph, texts, waypoints, extra=None):
 
 def main():
     graph, texts = extract()
+    kill = "ZABIJ POTWOR"
     plans = {
         # Training rooms and the four bare rooms around the school.
         "school-tour.json": ([3, 2, 4, 5, 10, 7, 8, 6, 9], {}),
@@ -206,12 +207,24 @@ def main():
                                    85, 87], {}),
         # The quest-master's road, reached from the shopping street.
         "quest-road-tour.json": ([100], {}),
+        # The cage fights. OLBRZYM has the highest starting SIL, so
+        # the 20- and 40-energy monsters die in a few rounds. Room
+        # 16 is left out because the earlier fights drain the
+        # player and its fight on entry can then kill them, which
+        # would make the tour's outcome depend on the clock-seeded
+        # Random; it gets its own scenario with a full-energy
+        # player. The corridor is left through 17 to the teleport.
+        "cage-fights-tour.json": ([11, 12, 13, 14, 15, 17, 1],
+                                  {12: [kill], 13: [kill], 14: [kill],
+                                   15: [kill]}, "OLBRZYM"),
     }
-    for name, (waypoints, extra) in plans.items():
-        steps = build(graph, texts, waypoints, extra)
+    for name, plan in plans.items():
+        waypoints, extra = plan[0], plan[1]
+        race = plan[2] if len(plan) > 2 else "POL-ELF"
+        steps = build(graph, texts, waypoints, extra, race)
         (OUT / name).write_text(json.dumps({"steps": steps}, indent=2) + "\n",
                                 encoding="utf-8")
-        print(f"{name}: {len(steps)} steps")
+        print(f"{name}: {len(steps)} steps (race {race})")
 
 
 if __name__ == "__main__":
