@@ -5,7 +5,7 @@ This file lists only remaining work.
 ## Remaining work
 
 1. **Coverage growth**: raise total FPC line coverage from the
-   53.87% level (nine passing scenario runs plus the Pascal unit
+   56.03% level (nine passing scenario runs plus the Pascal unit
    tests) toward the 100% goal, guided by the
    uncovered-lines report of
    `python3 tools/coverage_callgrind.py --dump-uncovered`;
@@ -17,7 +17,7 @@ This file lists only remaining work.
 
 2. **Pascal unit tests**: `tests/units` holds the plain-Pascal
    test framework (`pastest.pas`) and the first test program
-   (`test_przedm.pas`, 94 tests: MODE, KOMENDY, TRAIN,
+   (`test_przedm.pas`, 98 tests: MODE, KOMENDY, TRAIN,
    POTWORY ranges, TARCZA, BRANIE, UZYWANIE item round-trips,
    drop-item invariants, scene messages, WALKA stat arithmetic,
    WALKA special moves (parry, fireball, poison, poison
@@ -31,15 +31,20 @@ This file lists only remaining work.
    the 255-char ShortString limit and ends in MODE so the arena
    loop exits cleanly instead of spinning at EOF) and the
    MINIARENA EXIT and navigation branches (one EXIT per room
-   case plus each of the four movement commands), built and run host-native by
+   case plus each of the four movement commands), and the
+   FIGHTSCENA and FIGHTBLUSZCZ branches (the four musician
+   ZABIJ fights, all twelve bluszcz ZABIJ fights, the
+   SECRET LISTA / KUP DOKUMENT / KUP PLECAK shop, and
+   ROZMAWIAJ DUNCAN at DUNQ = 0 and -125, driven by
+   setting the wpisz global), built and run host-native by
    `tests/run_unit_tests.py` and merged into the Callgrind
-   coverage (PRZEDM.PAS 170 -> 1094 lines; the WALKA tests
+   coverage (PRZEDM.PAS 170 -> 1173 lines; the WALKA tests
    run in milliseconds because the runner links a Delay
    stub that wraps the crt unit's Delay). Next: the SWIAT room
    procedures (they read commands from stdin, so the runner
-   must pipe input), the remaining PRZEDM procedures that
-   dispatch on wpisz (FIGHTSCENA, FIGHTBLUSZCZ, BRANIE), the
-   inner WriteLn bodies of POROWNANIE and the rare heart/paczek
+   must pipe input), the remaining PRZEDM procedure that
+   dispatches on wpisz (BRANIE), the inner WriteLn bodies
+   of POROWNANIE and the rare heart/paczek
    drops of the encounter procedures (both need many samples),
    the WALKA learn branches (need FUKS = 0 from Random, so
    impractical via the combat loop), SMIERC (dead code: not in

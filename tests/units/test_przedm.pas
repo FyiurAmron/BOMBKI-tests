@@ -1095,6 +1095,66 @@ begin
   MiniarenaAt('ZACHOD', 33);
 end;
 
+procedure FightSetup;
+begin
+  {Give every musician and bluszcz-fight monster the same
+   room id so each ZABIJ guard holds, and raise ZRE so the
+   enemy rarely dodges: each combat then ends quickly.}
+  MIECHO := 100;
+  PERKUSISTA := 100; GITARZYSTA := 100; ORGANISTA := 100;
+  LIROY := 100; DUNCAN := 100;
+  SZCZAW := 100; STOKROTKA := 100; KONICZYNKA := 100;
+  MLECZ := 100; DMUCHAWIEC := 100; ROZA := 100;
+  OSET := 100; MALINA := 100; AGREST := 100;
+  JEZYNA := 100; TRAWA := 100;
+  SIL := 127; ZRE := 127; ENERGIA := 30000; PASZOL := 0;
+  DUNQ := 0; FORSA := 10000; PRZEPUSTKA := 100;
+  PLECAK := 100; QUEST := 0; KUNSZT := 0;
+end;
+
+procedure TestFightscena;
+begin
+  FightSetup;
+  wpisz := 'ZABIJ PERKUSISTA'; FIGHTSCENA;
+  wpisz := 'ZABIJ GITARZYSTA'; FIGHTSCENA;
+  wpisz := 'ZABIJ LIROY'; FIGHTSCENA;
+  wpisz := 'ZABIJ ORGANISTA'; FIGHTSCENA;
+end;
+
+procedure TestFightbluszczZabij;
+begin
+  FightSetup;
+  wpisz := 'ZABIJ DUNCAN'; FIGHTBLUSZCZ;
+  wpisz := 'ZABIJ SZCZAW'; FIGHTBLUSZCZ;
+  wpisz := 'ZABIJ STOKROTKA'; FIGHTBLUSZCZ;
+  wpisz := 'ZABIJ KONICZYNKA'; FIGHTBLUSZCZ;
+  wpisz := 'ZABIJ MLECZ'; FIGHTBLUSZCZ;
+  wpisz := 'ZABIJ DMUCHAWIEC'; FIGHTBLUSZCZ;
+  wpisz := 'ZABIJ ROZA'; FIGHTBLUSZCZ;
+  wpisz := 'ZABIJ OSET'; FIGHTBLUSZCZ;
+  wpisz := 'ZABIJ MALINA'; FIGHTBLUSZCZ;
+  wpisz := 'ZABIJ AGREST'; FIGHTBLUSZCZ;
+  wpisz := 'ZABIJ JEZYNA'; FIGHTBLUSZCZ;
+  wpisz := 'ZABIJ TRAWA'; FIGHTBLUSZCZ;
+end;
+
+procedure TestFightbluszczShop;
+begin
+  FightSetup;
+  wpisz := 'SECRET LISTA'; FIGHTBLUSZCZ;
+  wpisz := 'KUP DOKUMENT'; FIGHTBLUSZCZ;
+  wpisz := 'KUP PLECAK'; FIGHTBLUSZCZ;
+end;
+
+procedure TestFightbluszczDuncan;
+begin
+  FightSetup;
+  DUNQ := 0;
+  wpisz := 'ROZMAWIAJ DUNCAN'; FIGHTBLUSZCZ;
+  DUNQ := -125;
+  wpisz := 'ROZMAWIAJ DUNCAN'; FIGHTBLUSZCZ;
+end;
+
 begin
   RegisterTest('mode', TestMode);
   RegisterTest('komendy', TestKomendy);
@@ -1200,5 +1260,9 @@ begin
   RegisterTest('miniarena-srednio', TestMiniarenaSrednio);
   RegisterTest('miniarena-trudno', TestMiniarenaTrudno);
   RegisterTest('miniarena-exit-nav', TestMiniarenaExitNav);
+  RegisterTest('fightscena', TestFightscena);
+  RegisterTest('fightbluszcz-zabij', TestFightbluszczZabij);
+  RegisterTest('fightbluszcz-shop', TestFightbluszczShop);
+  RegisterTest('fightbluszcz-duncan', TestFightbluszczDuncan);
   RunTests;
 end.
