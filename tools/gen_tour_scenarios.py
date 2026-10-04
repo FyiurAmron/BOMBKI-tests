@@ -229,11 +229,6 @@ def main():
         # The arena approach: read its poster, which only exists at
         # room 32, before the crowd block.
         "arena-poster-tour.json": ([32], {32: ["PATRZ PLAKAT"]}),
-        # Room 86 (the poison attic) is left uncovered on
-        # purpose: it sits behind the tree in 85, and that
-        # tree is a NEASY fight no level-one build can
-        # win, so reaching 86 needs a far stronger build
-        # than any race starts as.
     }
 
     for name, plan in plans.items():
