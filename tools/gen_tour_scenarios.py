@@ -103,6 +103,12 @@ def extract():
     # Entering room 18 teleports to room 1 with no command, so the
     # edge carries a pseudo-direction that is never sent.
     graph.setdefault(18, {})["TELEPORT"] = 1
+    # Room 86 is only reachable from 85 through a conditional edge
+    # ("ZACHOD" and the tree is gone), which the plain
+    # "if wpisz = ... then MIECHO := N" scan cannot see. The
+    # caller must chop the tree first, so the edge is added here
+    # and the scenario sends ZABIJ DRZWI on arrival at 85.
+    graph.setdefault(85, {}).setdefault("ZACHOD", 86)
     return ({k: {d: t for d, t in v.items() if d}
              for k, v in graph.items() if v}, texts)
 
@@ -129,7 +135,8 @@ def path(graph, frm, to):
     return legs
 
 
-def build(graph, texts, waypoints, extra=None, race="POL-ELF"):
+def build(graph, texts, waypoints, extra=None, race="POL-ELF",
+          prelude=None):
     """Build scenario steps: walk the waypoints, running each exit list."""
     extra = extra or {}
     seq = [(0, None), (1, "POLNOC")]
@@ -150,6 +157,8 @@ def build(graph, texts, waypoints, extra=None, race="POL-ELF"):
         {"label": "startup key read",
          "expect": "ABY SIE PATRZEC UZYJ KOMENDY PATRZ", "send": ""},
     ]
+    if prelude:
+        steps.extend(prelude(graph, texts))
     done = set()
     for i, (room, _) in enumerate(seq):
         if room in NO_PROMPT:
@@ -217,7 +226,16 @@ def main():
         "cage-fights-tour.json": ([11, 12, 13, 14, 15, 17, 1],
                                   {12: [kill], 13: [kill], 14: [kill],
                                    15: [kill]}, "OLBRZYM"),
+        # The arena approach: read its poster, which only exists at
+        # room 32, before the crowd block.
+        "arena-poster-tour.json": ([32], {32: ["PATRZ PLAKAT"]}),
+        # Room 86 (the poison attic) is left uncovered on
+        # purpose: it sits behind the tree in 85, and that
+        # tree is a NEASY fight no level-one build can
+        # win, so reaching 86 needs a far stronger build
+        # than any race starts as.
     }
+
     for name, plan in plans.items():
         waypoints, extra = plan[0], plan[1]
         race = plan[2] if len(plan) > 2 else "POL-ELF"
