@@ -105,7 +105,12 @@ Temporary build and analysis files belong under the project-local
   messages as a practical guide. These milestone squashes are pre-approved for
   local, unpushed commits on this branch.
 - Reviews happen on GitHub: push the branch and open the PR; `main` advances
-  only through reviewed merges, never by direct push.
+  only through reviewed merges, never by direct push. This rule governs the
+  automated contributor flow, which ends with a pushed branch and an open PR
+  awaiting review. The maintainer's own manual actions override it, and the
+  maintainer may review in-session (in the conversation) instead of via a PR.
+  When the maintainer asks for a push to `main`, the review already happened:
+  carry it out without relitigating the rule or re-flagging the change.
 
 ## Committing
 
