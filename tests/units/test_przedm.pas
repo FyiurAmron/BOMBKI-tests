@@ -1063,6 +1063,38 @@ begin
   MINIARENA;
 end;
 
+procedure MiniarenaAt(const cmd: string; miechoVal: integer);
+begin
+  MIECHO := miechoVal;
+  FeedStdin(cmd);
+  MINIARENA;
+end;
+
+procedure TestMiniarenaExitNav;
+begin
+  {EXIT lists the available exits for the current room; each
+   case runs its WriteLn bodies only for its own room id, so
+   visit one room id per case. MODE then leaves the loop
+   (EXIT alone does not change ARENA).}
+  MiniarenaAt('EXIT|MODE', 33);
+  MiniarenaAt('EXIT|MODE', 34);
+  MiniarenaAt('EXIT|MODE', 35);
+  MiniarenaAt('EXIT|MODE', 40);
+  MiniarenaAt('EXIT|MODE', 41);
+  MiniarenaAt('EXIT|MODE', 45);
+  MiniarenaAt('EXIT|MODE', 46);
+  MiniarenaAt('EXIT|MODE', 47);
+  MiniarenaAt('EXIT|MODE', 56);
+  MiniarenaAt('EXIT|MODE', 57);
+  {Each navigation command sets ARENA := 0, so the arena loop
+   leaves after one command, and every per-room if in the
+   block is evaluated, covering the whole branch.}
+  MiniarenaAt('POLODNIE', 33);
+  MiniarenaAt('POLNOC', 33);
+  MiniarenaAt('WSCHOD', 33);
+  MiniarenaAt('ZACHOD', 33);
+end;
+
 begin
   RegisterTest('mode', TestMode);
   RegisterTest('komendy', TestKomendy);
@@ -1167,5 +1199,6 @@ begin
   RegisterTest('miniarena-mniejslabo', TestMiniarenaMniejslabo);
   RegisterTest('miniarena-srednio', TestMiniarenaSrednio);
   RegisterTest('miniarena-trudno', TestMiniarenaTrudno);
+  RegisterTest('miniarena-exit-nav', TestMiniarenaExitNav);
   RunTests;
 end.
