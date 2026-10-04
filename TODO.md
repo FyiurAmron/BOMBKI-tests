@@ -5,7 +5,7 @@ This file lists only remaining work.
 ## Remaining work
 
 1. **Coverage growth**: raise total FPC line coverage from the
-   45.67% level (nine passing scenario runs plus the Pascal unit
+   49.74% level (nine passing scenario runs plus the Pascal unit
    tests) toward the 100% goal, guided by the
    uncovered-lines report of
    `python3 tools/coverage_callgrind.py --dump-uncovered`;
@@ -17,22 +17,30 @@ This file lists only remaining work.
 
 2. **Pascal unit tests**: `tests/units` holds the plain-Pascal
    test framework (`pastest.pas`) and the first test program
-   (`test_przedm.pas`, 87 tests: MODE, KOMENDY, TRAIN,
+   (`test_przedm.pas`, 90 tests: MODE, KOMENDY, TRAIN,
    POTWORY ranges, TARCZA, BRANIE, UZYWANIE item round-trips,
    drop-item invariants, scene messages, WALKA stat arithmetic,
    WALKA special moves (parry, fireball, poison, poison
    damage over time, super kop, flee, potrawki, death, fukroll
    redraw, dodges), the encounter procedures (SLABO through
    BTRUDNO), and the rare-gain branches of the loot
-   procedures), built and run host-native by
+   procedures, the stdin-driven ReadLn procedures (PIERDOLY's
+   ZMIEN TLO branch and POROWNANIE with mana), and the MINIARENA
+   ZABIJ branches (all 28 arena monsters, split into four
+   per-encounter-type tests so each command string stays under
+   the 255-char ShortString limit and ends in MODE so the arena
+   loop exits cleanly instead of spinning at EOF), built and run host-native by
    `tests/run_unit_tests.py` and merged into the Callgrind
-   coverage (PRZEDM.PAS 170 -> 794 lines; the WALKA tests
+   coverage (PRZEDM.PAS 170 -> 943 lines; the WALKA tests
    run in milliseconds because the runner links a Delay
    stub that wraps the crt unit's Delay). Next: the SWIAT room
    procedures (they read commands from stdin, so the runner
-   must pipe input), the remaining PRZEDM procedures (POROWNANIE,
-   SMIERC, PIERDOLY, MINIARENA, FIGHTSCENA, FIGHTBLUSZCZ -
-   these read commands from stdin), MONSTRA.WSTEP (waits for a
+   must pipe input), the remaining stdin-driven PRZEDM
+   procedures (FIGHTSCENA, FIGHTBLUSZCZ), the inner WriteLn
+   bodies of POROWNANIE and the rare heart/paczek drops of
+   the encounter procedures (both need many samples), SMIERC
+   (dead code: not in the PRZEDM interface and never called,
+   so no test can reach it), MONSTRA.WSTEP (waits for a
    keypress), and running the same test sources under genuine
    TP7 in DOSEMU2.
 

@@ -6,6 +6,30 @@ PRZEDM globals it reads, so the tests are
 order-independent and safe to run one per process.}
 uses pastest, MONSTRA, PRZEDM;
 
+{Write the given lines (separated by '|') to a temp
+ file and redirect standard input to it, so the
+ procedures that ReadLn from the terminal can be
+ driven deterministically. Reassigning input works
+ in FPC TP mode and is safe to repeat per test.}
+procedure FeedStdin(const lines: string);
+var
+  f: text;
+  i, start: integer;
+begin
+  assign(f, 'build/tmp/stdin.txt');
+  rewrite(f);
+  start := 1;
+  for i := 1 to Length(lines) + 1 do
+    if (i > Length(lines)) or (lines[i] = '|') then
+    begin
+      WriteLn(f, Copy(lines, start, i - start));
+      start := i + 1;
+    end;
+  close(f);
+  assign(input, 'build/tmp/stdin.txt');
+  reset(input);
+end;
+
 procedure TestMode;
 begin
   MIECHO := 42;
@@ -975,6 +999,70 @@ begin
   CheckEqual(1, MIECHO, 'BLUSZCZ leaves MIECHO unchanged');
 end;
 
+procedure TestPierdolyTlo;
+begin
+  FeedStdin('1');
+  wpisz := 'ZMIEN TLO';
+  PIERDOLY;
+end;
+
+procedure TestPorownanie;
+begin
+  MANA := 10;
+  FeedStdin('DZIK');
+  POROWNANIE;
+end;
+
+procedure MiniarenaSetup;
+begin
+  {Give every arena monster the same id (33) so the
+   MIECHO = <monster> guard holds for each ZABIJ cmd.
+   Raise ZRE so the enemy rarely dodges: each combat
+   then ends in one or two rounds, keeping the arena
+   tests cheap.}
+  BAKTERIA := 33; SLIMAK := 33; KORNIK := 33; MUCHA := 33;
+  ZUK := 33; KARALUCH := 33; MROWKA := 33; PAJAK := 33;
+  DZIK := 33; WILCZUR := 33; SZCZUR := 33; LIS := 33;
+  KUROPATWA := 33; ZAJAC := 33; ORZEL := 33; SARNA := 33;
+  SLON := 33; LEW := 33; ZYRAFA := 33; WILK := 33;
+  WIELBLAD := 33; STRUS := 33; BOA := 33; BIZON := 33;
+  PANTERA := 33; GLADIATOR := 33; WOJOWNIK := 33; TRENER := 33;
+  MIECHO := 33;
+  SIL := 127; ZRE := 127; ENERGIA := 30000; PASZOL := 0;
+end;
+
+procedure TestMiniarenaSlabo;
+begin
+  MiniarenaSetup;
+  FeedStdin('ZABIJ BAKTERIA|ZABIJ SLIMAK|ZABIJ KORNIK|ZABIJ MUCHA|' +
+    'ZABIJ ZUK|ZABIJ KARALUCH|ZABIJ MROWKA|ZABIJ PAJAK|MODE');
+  MINIARENA;
+end;
+
+procedure TestMiniarenaMniejslabo;
+begin
+  MiniarenaSetup;
+  FeedStdin('ZABIJ DZIK|ZABIJ WILCZUR|ZABIJ SZCZUR|ZABIJ LIS|' +
+    'ZABIJ KUROPATWA|ZABIJ ZAJAC|ZABIJ ORZEL|ZABIJ SARNA|MODE');
+  MINIARENA;
+end;
+
+procedure TestMiniarenaSrednio;
+begin
+  MiniarenaSetup;
+  FeedStdin('ZABIJ SLON|ZABIJ LEW|ZABIJ ZYRAFA|ZABIJ WILK|' +
+    'ZABIJ WIELBLAD|ZABIJ STRUS|ZABIJ BOA|ZABIJ BIZON|' +
+    'ZABIJ PANTERA|MODE');
+  MINIARENA;
+end;
+
+procedure TestMiniarenaTrudno;
+begin
+  MiniarenaSetup;
+  FeedStdin('ZABIJ GLADIATOR|ZABIJ WOJOWNIK|ZABIJ TRENER|MODE');
+  MINIARENA;
+end;
+
 begin
   RegisterTest('mode', TestMode);
   RegisterTest('komendy', TestKomendy);
@@ -1073,5 +1161,11 @@ begin
   RegisterTest('kto-messages', TestKtoMessages);
   RegisterTest('ulsklep-messages', TestUlSklepMessages);
   RegisterTest('bluszcz-messages', TestBluszczMessages);
+  RegisterTest('pierdoly-tlo', TestPierdolyTlo);
+  RegisterTest('porownanie', TestPorownanie);
+  RegisterTest('miniarena-slabo', TestMiniarenaSlabo);
+  RegisterTest('miniarena-mniejslabo', TestMiniarenaMniejslabo);
+  RegisterTest('miniarena-srednio', TestMiniarenaSrednio);
+  RegisterTest('miniarena-trudno', TestMiniarenaTrudno);
   RunTests;
 end.
