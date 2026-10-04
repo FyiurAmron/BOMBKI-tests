@@ -26,7 +26,9 @@ procedure RunTests;
 implementation
 
 const
-  MaxTests = 100;
+  {Static arrays keep the unit TP7-compatible; the cap is
+   only a guard against runaway registration.}
+  MaxTests = 200;
 
 var
   TestNames: array[1..MaxTests] of string;

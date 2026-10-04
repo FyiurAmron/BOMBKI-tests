@@ -613,6 +613,42 @@ begin
   CheckEqual(0, PRZED, 'BIERZ STARY counts nothing without the sword');
 end;
 
+procedure TestBraniePicksUpBluszczItems;
+begin
+  MIECHO2 := 7;
+  MTARCZA := 7; SERCE := 7; DYPLOM := 7; FAJKA := 7;
+  PRZED := 0; MAD := 0; MAXMAD := 5; MONSTRA.MAXE := 50;
+  wpisz := 'BIERZ MALA'; BRANIE;
+  wpisz := 'BIERZ SERCE'; BRANIE;
+  wpisz := 'BIERZ DYPLOM'; BRANIE;
+  wpisz := 'BIERZ FAJKA'; BRANIE;
+  CheckEqual(-10, MTARCZA, 'BIERZ MALA stores the shield as -10');
+  CheckEqual(-10, SERCE, 'BIERZ SERCE stores the heart as -10');
+  CheckEqual(-10, DYPLOM, 'BIERZ DYPLOM stores the diploma as -10');
+  CheckEqual(-10, FAJKA, 'BIERZ FAJKA stores the pipe as -10');
+  CheckEqual(4, PRZED, 'four BRANIE picks count four items');
+  CheckEqual(55, MONSTRA.MAXE, 'BIERZ DYPLOM adds five max energy');
+  CheckEqual(1, MAD, 'BIERZ FAJKA adds one wisdom under the cap');
+end;
+
+procedure TestBranieDropsBluszczItems;
+begin
+  MIECHO2 := 7;
+  MTARCZA := -10; SERCE := -10; DYPLOM := -10; FAJKA := -10;
+  PRZED := 4; MAD := 1; MONSTRA.MAXE := 55;
+  wpisz := 'ODRZUC FAJKA'; BRANIE;
+  wpisz := 'ODRZUC MALA'; BRANIE;
+  wpisz := 'ODRZUC SERCE'; BRANIE;
+  wpisz := 'ODRZUC DYPLOM'; BRANIE;
+  CheckEqual(7, MTARCZA, 'ODRZUC MALA restores the shield marker');
+  CheckEqual(7, SERCE, 'ODRZUC SERCE restores the heart marker');
+  CheckEqual(7, DYPLOM, 'ODRZUC DYPLOM restores the diploma marker');
+  CheckEqual(7, FAJKA, 'ODRZUC FAJKA restores the pipe marker');
+  CheckEqual(0, PRZED, 'four ODRZUC drops uncount four items');
+  CheckEqual(50, MONSTRA.MAXE, 'ODRZUC DYPLOM removes five max energy');
+  CheckEqual(0, MAD, 'ODRZUC FAJKA removes one wisdom');
+end;
+
 procedure TestUzywaSerce;
 begin
   SERCE := -10; ENERGIA := 10; MONSTRA.MAXE := 50; PRZED := 1;
@@ -1155,6 +1191,225 @@ begin
   wpisz := 'ROZMAWIAJ DUNCAN'; FIGHTBLUSZCZ;
 end;
 
+procedure PorownanieAsk(const monster: string;
+  aPoziom, aSil, aZre, aPar, aKop: Integer);
+begin
+  {Drive one POROWNANIE conversation. The prompt reads the
+   monster name from stdin, and the reply branches key off
+   MONSTRA.OGOL (POZIOM + SIL plus the ZRE/PAR/KOP bonuses)
+   and SIL, so both are set to reach each band.}
+  FeedStdin(monster);
+  MANA := 10; POZIOM := aPoziom; SIL := aSil; ZRE := aZre;
+  PAR := aPar; KOP := aKop;
+  POROWNANIE;
+end;
+
+procedure TestPorownanieBeasts;
+begin
+  {The beasts group (DZIK and friends) warns below OGOL 16,
+   again from 16 to 18, and above 18.}
+  PorownanieAsk('DZIK', 0, 0, 0, 0, 0);
+  PorownanieAsk('KUROPATWA', 0, 16, 0, 0, 0);
+  PorownanieAsk('SARNA', 0, 19, 0, 0, 0);
+  PorownanieAsk('DZIADEK', 0, 30, 0, 0, 0);
+  CheckEqual(30, SIL, 'POROWNANIE leaves the last SIL in place');
+end;
+
+procedure TestPorownanieBigBeasts;
+begin
+  {The big-beasts group (SLON and friends) uses OGOL 16 and
+   SIL 16, 21, and 23 as its four band edges.}
+  PorownanieAsk('SLON', 0, 0, 0, 0, 0);
+  PorownanieAsk('LEW', 0, 16, 0, 0, 0);
+  PorownanieAsk('ZYRAFA', 0, 21, 0, 0, 0);
+  PorownanieAsk('REPORTER', 0, 23, 0, 0, 0);
+end;
+
+procedure TestPorownanieFighters;
+begin
+  {The fighters group (GLADIATOR and friends) bands on
+   OGOL 15, 15 to 18, 18 to 23, 23 to 26, and above 26.}
+  PorownanieAsk('GLADIATOR', 0, 0, 0, 0, 0);
+  PorownanieAsk('WOJOWNIK', 0, 16, 0, 0, 0);
+  PorownanieAsk('TRENER', 0, 20, 0, 0, 0);
+  PorownanieAsk('POLICJANT', 0, 24, 0, 0, 0);
+  PorownanieAsk('GORYL', 0, 27, 0, 0, 0);
+  PorownanieAsk('OCHRONIARZ', 0, 30, 0, 0, 0);
+end;
+
+procedure TestPorownanieDrunks;
+begin
+  {The drunks group (MINI-BARMAN and friends) bands on
+   OGOL 24, 24 to 26, 26 to 29, 29, and above 34.}
+  PorownanieAsk('MINI-BARMAN', 0, 0, 0, 0, 0);
+  PorownanieAsk('GRUBAS', 0, 25, 0, 0, 0);
+  PorownanieAsk('D.J', 0, 27, 0, 0, 0);
+  PorownanieAsk('GRUBAS', 0, 29, 0, 0, 0);
+  PorownanieAsk('D.J', 0, 35, 0, 0, 0);
+end;
+
+procedure TestPorownanieMusicians;
+begin
+  {The musicians group (TAKSOWKARZ and friends) bands on
+   OGOL 21, 23 to 28, and above 28.}
+  PorownanieAsk('TAKSOWKARZ', 0, 0, 0, 0, 0);
+  PorownanieAsk('GITARZYSTA', 0, 23, 0, 0, 0);
+  PorownanieAsk('PERKUSISTA', 0, 26, 0, 0, 0);
+  PorownanieAsk('ORGANISTA', 0, 29, 0, 0, 0);
+  PorownanieAsk('ZEBRAK', 0, 30, 0, 0, 0);
+end;
+
+procedure TestPorownanieBluszcz;
+begin
+  {The bluszcz group (PEDAL and friends) bands on OGOL 20,
+   20 to 26, 26 to 30, 30, and above 35. The ZRE 8 to 21
+   bonus branches shift OGOL by four to ten, so they run
+   here too.}
+  PorownanieAsk('PEDAL', 0, 0, 0, 0, 0);
+  PorownanieAsk('PARA', 0, 20, 0, 0, 0);
+  PorownanieAsk('MACIEK', 0, 26, 0, 0, 0);
+  PorownanieAsk('ROZA', 0, 30, 0, 0, 0);
+  PorownanieAsk('MALINA', 0, 36, 0, 0, 0);
+  PorownanieAsk('TRAWA', 0, 0, 9, 0, 0);
+  PorownanieAsk('AGREST', 0, 0, 11, 0, 0);
+  PorownanieAsk('JEZYNA', 0, 0, 13, 0, 0);
+  PorownanieAsk('TRAWA', 0, 0, 15, 0, 0);
+  PorownanieAsk('AGREST', 0, 0, 17, 0, 0);
+  PorownanieAsk('JEZYNA', 0, 0, 19, 0, 0);
+  PorownanieAsk('TRAWA', 0, 0, 21, 0, 0);
+end;
+
+procedure TestPorownanieLiroyAndDogs;
+begin
+  {LIROY bands on OGOL 28, 28 to 33, 33 to 44, 44 to 48,
+   and above 48; POKRZYWA on 40 and above 40; the dog group
+   always answers.}
+  PorownanieAsk('LIROY', 0, 0, 0, 0, 0);
+  PorownanieAsk('LIROY', 0, 28, 0, 0, 0);
+  PorownanieAsk('LIROY', 0, 33, 0, 0, 0);
+  PorownanieAsk('LIROY', 0, 44, 0, 0, 0);
+  PorownanieAsk('LIROY', 0, 48, 0, 0, 0);
+  PorownanieAsk('POKRZYWA', 0, 0, 0, 0, 0);
+  PorownanieAsk('POKRZYWA', 0, 41, 0, 0, 0);
+  PorownanieAsk('SPANIEL', 0, 0, 0, 0, 0);
+  PorownanieAsk('OWCZAREK', 0, 0, 0, 0, 0);
+  PorownanieAsk('PIESEK', 0, 0, 0, 0, 0);
+  PorownanieAsk('JAMNIK', 0, 0, 0, 0, 0);
+  PorownanieAsk('PUDEL', 0, 0, 0, 0, 0);
+end;
+
+procedure TestPorownanieBonusesAndBakteria;
+begin
+  {The PAR over 50 and over 75 plus the KOP over 10 and over
+   70 bonuses add up to six to OGOL, and BAKTERIA restores
+   five mana. ZRE 8 to 21 is covered by the bluszcz test.}
+  PorownanieAsk('DZIK', 0, 10, 0, 51, 11);
+  PorownanieAsk('DZIK', 0, 10, 0, 76, 71);
+  FeedStdin('BAKTERIA');
+  MANA := 10;
+  POROWNANIE;
+  CheckEqual(15, MANA, 'BAKTERIA restores five mana');
+end;
+
+procedure LootSetup;
+begin
+  {The heart drops need SERCE clear (neither held nor on
+   the floor) and the player still standing after the fight,
+   so start with an empty SERCE, a healthy ENERGIA, and no
+   flee skill, then call the encounter many times: each draw
+   is independent, so the rare drop lands eventually. SERCE
+   must be reset here: earlier tests leave it held, which
+   would skip every drop.}
+  SERCE := 0;
+  ENERGIA := 30000; SIL := 127; ZRE := 127; PASZOL := 0;
+  ZWIEJ := 0; WIMP := 0; MANA := 0; FIREBALL := 0;
+  POISON := 0; ILEPOI := 0; KOP := 0; KOPM := 0;
+  KOPHP := 0; PRO := 0; ILOSC := 0; FUKSROLL := 0;
+  PRZED := 0;
+end;
+
+procedure TestEncounterHeartVeasy;
+var i: Integer;
+begin
+  LootSetup;
+  for i := 1 to 160 do
+    if SERCE = 0 then VEASY;
+  CheckEqual(-10, SERCE, 'VEASY eventually drops the heart');
+end;
+
+procedure TestEncounterHeartEasy;
+var i: Integer;
+begin
+  LootSetup;
+  for i := 1 to 160 do
+    if SERCE = 0 then EASY;
+  CheckEqual(-10, SERCE, 'EASY eventually drops the heart');
+end;
+
+procedure TestEncounterHeartNeasy;
+var i: Integer;
+begin
+  LootSetup;
+  for i := 1 to 160 do
+    if SERCE = 0 then NEASY;
+  CheckEqual(-10, SERCE, 'NEASY eventually drops the heart');
+end;
+
+procedure TestEncounterHeartTrudno;
+var i: Integer;
+begin
+  LootSetup;
+  for i := 1 to 110 do
+    if SERCE = 0 then TRUDNO;
+  CheckEqual(-10, SERCE, 'TRUDNO eventually drops the heart');
+end;
+
+procedure TestEncounterHeartBtrudno;
+var i: Integer;
+begin
+  LootSetup;
+  for i := 1 to 150 do
+    if SERCE = 0 then BTRUDNO;
+  CheckEqual(-10, SERCE, 'BTRUDNO eventually drops the heart');
+end;
+
+procedure TestWalkaPotrawkiLearn;
+var
+  i: Integer;
+  learned: Boolean;
+begin
+  {The potrawki lesson needs the victory draw to come up
+   zero, so fight many one-round battles: each victory draws
+   independently, so the lesson lands eventually. POTRAWKI is
+   reset per fight so the drop cannot saturate BIGOS.}
+  learned := false;
+  for i := 1 to 800 do begin
+    WalkaSetup(0, 0, 127, 1, 127, 1, 0, 0);
+    ENERGIA := 100; POTRAWKI := 1; BIGOS := 0;
+    WALKA;
+    if POTRAWKI > 1 then
+      learned := true;
+  end;
+  CheckTrue(learned, 'WALKA eventually teaches the potrawki skill');
+end;
+
+procedure TestWalkaParryLearn;
+var
+  i: Integer;
+begin
+  {The parry lesson needs the parry draw to come up zero, so
+   run many long battles with a high PAR (the lesson stops
+   once PAR reaches 100, which the loop detects).}
+  for i := 1 to 60 do begin
+    WalkaSetup(0, 3000, 127, 5, 127, 1, 99, 0);
+    ENERGIA := 30000;
+    WALKA;
+    if PAR > 99 then
+      Break;
+  end;
+  CheckTrue(PAR > 99, 'WALKA eventually teaches the parry skill');
+end;
+
 begin
   RegisterTest('mode', TestMode);
   RegisterTest('komendy', TestKomendy);
@@ -1216,6 +1471,8 @@ begin
   RegisterTest('branie-pickup', TestBraniePicksUpSword);
   RegisterTest('branie-drop', TestBranieDropsSword);
   RegisterTest('branie-ignores-missing', TestBranieIgnoresMissingSword);
+  RegisterTest('branie-pickup-items', TestBraniePicksUpBluszczItems);
+  RegisterTest('branie-drop-items', TestBranieDropsBluszczItems);
   RegisterTest('uzywa-serce', TestUzywaSerce);
   RegisterTest('uzywa-serce-clamp', TestUzywaSerceClampsAtMaxE);
   RegisterTest('uzywa-komplet', TestUzywaKomplet);
@@ -1264,5 +1521,21 @@ begin
   RegisterTest('fightbluszcz-zabij', TestFightbluszczZabij);
   RegisterTest('fightbluszcz-shop', TestFightbluszczShop);
   RegisterTest('fightbluszcz-duncan', TestFightbluszczDuncan);
+  RegisterTest('porownanie-beasts', TestPorownanieBeasts);
+  RegisterTest('porownanie-big-beasts', TestPorownanieBigBeasts);
+  RegisterTest('porownanie-fighters', TestPorownanieFighters);
+  RegisterTest('porownanie-drunks', TestPorownanieDrunks);
+  RegisterTest('porownanie-musicians', TestPorownanieMusicians);
+  RegisterTest('porownanie-bluszcz', TestPorownanieBluszcz);
+  RegisterTest('porownanie-liroy-dogs', TestPorownanieLiroyAndDogs);
+  RegisterTest('porownanie-bonuses-bakteria',
+    TestPorownanieBonusesAndBakteria);
+  RegisterTest('encounter-heart-veasy', TestEncounterHeartVeasy);
+  RegisterTest('encounter-heart-easy', TestEncounterHeartEasy);
+  RegisterTest('encounter-heart-neasy', TestEncounterHeartNeasy);
+  RegisterTest('encounter-heart-trudno', TestEncounterHeartTrudno);
+  RegisterTest('encounter-heart-btrudno', TestEncounterHeartBtrudno);
+  RegisterTest('walka-potrawki-learn', TestWalkaPotrawkiLearn);
+  RegisterTest('walka-parry-learn', TestWalkaParryLearn);
   RunTests;
 end.
