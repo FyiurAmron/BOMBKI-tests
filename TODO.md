@@ -4,28 +4,33 @@ This file lists only remaining work.
 
 ## Remaining work
 
-1. **Coverage growth**: raise total FPC line coverage from the
-   56.03% level (nine passing scenario runs plus the Pascal unit
-   tests) toward the 100% goal, guided by the
-   uncovered-lines report of
-   `python3 tools/coverage_callgrind.py --dump-uncovered`;
-   add scenarios for the
-   untested paths (combat, items, death, and the rest of the
-   command set) and Pascal unit tests for the deterministic
-   unit internals. Use `--fail-under 100` as the gate once
-   coverage reaches 100%.
+1. **Coverage growth**: PRZEDM.PAS and MONSTRA.PAS are now at
+   100% of their reachable lines; raise total FPC line
+   coverage from the 58.38% level (nine passing scenario runs
+   plus the Pascal unit tests) toward the 100% goal, guided
+   by the uncovered-lines report of
+   `python3 tools/coverage_callgrind.py --dump-uncovered`.
+   The bulk of the remainder is BOMBKI.PAS (the main program:
+   command dispatch, room walking, save/load) and SWIAT.PAS
+   (the room procedures, which read commands from stdin, so
+   the runner must pipe input). Use `--fail-under 100` as the
+   gate once total coverage reaches 100%.
 
 2. **Pascal unit tests**: `tests/units` holds the plain-Pascal
    test framework (`pastest.pas`) and the first test program
-   (`test_przedm.pas`, 98 tests: MODE, KOMENDY, TRAIN,
+   (`test_przedm.pas`, 115 tests: MODE, KOMENDY, TRAIN,
    POTWORY ranges, TARCZA, BRANIE, UZYWANIE item round-trips,
    drop-item invariants, scene messages, WALKA stat arithmetic,
    WALKA special moves (parry, fireball, poison, poison
    damage over time, super kop, flee, potrawki, death, fukroll
-   redraw, dodges), the encounter procedures (SLABO through
-   BTRUDNO), and the rare-gain branches of the loot
+   redraw, dodges, and the parry and potrawki skill lessons
+   that need a zero draw), the encounter procedures (SLABO
+   through BTRUDNO, including their rare heart drops), and the
+   rare-gain branches of the loot
    procedures, the stdin-driven ReadLn procedures (PIERDOLY's
-   ZMIEN TLO branch and POROWNANIE with mana), and the MINIARENA
+   ZMIEN TLO branch and POROWNANIE: every monster group and
+   every MONSTRA.OGOL band, driven by one stdin line per
+   call), and the MINIARENA
    ZABIJ branches (all 28 arena monsters, split into four
    per-encounter-type tests so each command string stays under
    the 255-char ShortString limit and ends in MODE so the arena
@@ -38,18 +43,16 @@ This file lists only remaining work.
    ROZMAWIAJ DUNCAN at DUNQ = 0 and -125, driven by
    setting the wpisz global), built and run host-native by
    `tests/run_unit_tests.py` and merged into the Callgrind
-   coverage (PRZEDM.PAS 170 -> 1173 lines; the WALKA tests
+   coverage (PRZEDM.PAS 170 -> 1259 of 1259 reachable lines;
+   the WALKA tests
    run in milliseconds because the runner links a Delay
-   stub that wraps the crt unit's Delay). Next: the SWIAT room
-   procedures (they read commands from stdin, so the runner
-   must pipe input), the remaining PRZEDM procedure that
-   dispatches on wpisz (BRANIE), the inner WriteLn bodies
-   of POROWNANIE and the rare heart/paczek
-   drops of the encounter procedures (both need many samples),
-   the WALKA learn branches (need FUKS = 0 from Random, so
-   impractical via the combat loop), SMIERC (dead code: not in
-   the PRZEDM interface and never called, so no test can reach
-   it), MONSTRA.WSTEP (waits for a keypress), and running the
+   stub that wraps the crt unit's Delay). PRZEDM's SMIERC is
+   never called in the original and is not in the unit
+   interface, so no test can reach it; the coverage tool
+   excludes such never-called procedures instead of changing
+   the reconstructed source. Next: the SWIAT room procedures,
+   the BOMBKI.PAS command dispatch and save/load paths, and
+   MONSTRA.WSTEP (waits for a keypress), plus running the
    same test sources under genuine TP7 in DOSEMU2.
 
 ## Completed
