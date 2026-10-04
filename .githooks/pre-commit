@@ -26,7 +26,7 @@ fi
 for f in $(git diff --cached --name-only --diff-filter=ACMR); do
   [ -f "$f" ] || continue  # skip deletions
   case "$f" in
-    *.pas|*.sh|*.py|*.yml|*.yaml|*.md|*.conf|*.txt|*.cfg|*.toml|*.ini|Dockerfile*|.gitignore|.githooks/*)
+    *.pas|*.sh|*.py|*.json|*.yml|*.yaml|*.md|*.conf|*.txt|*.cfg|*.toml|*.ini|Dockerfile*|.gitignore|.githooks/*)
       # newline at EOF: a final LF byte yields no match for `.`
       if git show ":$f" 2>/dev/null | tail -c 1 | grep -q .; then
         echo "error: $f missing newline at EOF" >&2
