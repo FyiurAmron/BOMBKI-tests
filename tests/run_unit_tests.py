@@ -41,8 +41,13 @@ TARGET_FLAGS = {
 }
 
 SUMMARY = re.compile(r"tests: (\d+), failures: (\d+)")
-RUN_LINE = re.compile(r"^RUN (\S+)$", re.MULTILINE)
-FAIL_LINE = re.compile(r"^FAIL \[(\S+)\]", re.MULTILINE)
+# A test that prints a prompt with write() (no newline, e.g.
+# MINIARENA) leaves the output mid-line, so the framework's
+# next "RUN <name>" / "FAIL [...]" line is appended to that
+# prompt. Match them anywhere in the line, not only at the
+# start, so every test is counted and re-run in isolation.
+RUN_LINE = re.compile(r"RUN (\S+)$", re.MULTILINE)
+FAIL_LINE = re.compile(r"FAIL \[(\S+)\]", re.MULTILINE)
 
 
 def resolve_executable(name: str) -> str:
