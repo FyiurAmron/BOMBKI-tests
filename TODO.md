@@ -4,17 +4,15 @@ This file lists only remaining work.
 
 ## Remaining work
 
-1. **Coverage growth**: PRZEDM.PAS and MONSTRA.PAS are now at
-   100% of their reachable lines; raise total FPC line
-   coverage from the 58.38% level (nine passing scenario runs
-   plus the Pascal unit tests) toward the 100% goal, guided
-   by the uncovered-lines report of
+1. **Coverage growth**: PRZEDM.PAS, MONSTRA.PAS, and SWIAT.PAS
+   are now at 100% of their reachable lines; raise total FPC
+   line coverage from the 64.66% level (nine passing scenario
+   runs plus the Pascal unit tests) toward the 100% goal,
+   guided by the uncovered-lines report of
    `python3 tools/coverage_callgrind.py --dump-uncovered`.
-   The bulk of the remainder is BOMBKI.PAS (the main program:
-   command dispatch, room walking, save/load) and SWIAT.PAS
-   (the room procedures, which read commands from stdin, so
-   the runner must pipe input). Use `--fail-under 100` as the
-   gate once total coverage reaches 100%.
+   All that remains is BOMBKI.PAS, the main program (command
+   dispatch, room walking, save/load, and the intro). Use
+   `--fail-under 100` as the gate once it reaches 100%.
 
 2. **Pascal unit tests**: `tests/units` holds the plain-Pascal
    test framework (`pastest.pas`) and the first test program
@@ -50,10 +48,22 @@ This file lists only remaining work.
    never called in the original and is not in the unit
    interface, so no test can reach it; the coverage tool
    excludes such never-called procedures instead of changing
-   the reconstructed source. Next: the SWIAT room procedures,
-   the BOMBKI.PAS command dispatch and save/load paths, and
-   MONSTRA.WSTEP (waits for a keypress), plus running the
-   same test sources under genuine TP7 in DOSEMU2.
+   the reconstructed source. A second program
+   (`test_swiat.pas`, 19 tests) covers the SWIAT room
+   procedures, which loop on ReadLn until MIECHO leaves the
+   room: each test sets MIECHO to the room id, pipes that
+   room's commands in through standard input (the same
+   FeedStdin helper the PRZEDM tests use), and ends with a
+   command that leaves the room, so the loop terminates
+   instead of spinning at EOF. That covers the exit lists and
+   poster text of every room, the room-13 monster fight with
+   its sword, shield, and heart drops and its flee path, and
+   the whole quest-master road (the three quest purchases,
+   all three hand-ins, the blocked and open west road, the
+   quest list, and killing the master). Next: the BOMBKI.PAS
+   command dispatch, room walking, and save/load paths, plus
+   MONSTRA.WSTEP (waits for a keypress), and running the same
+   test sources under genuine TP7 in DOSEMU2.
 
 ## Completed
 
