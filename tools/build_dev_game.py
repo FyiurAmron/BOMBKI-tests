@@ -22,6 +22,7 @@ PROJECT = Path(__file__).resolve().parents[1]
 SOURCES = PROJECT / "_reconstructed"
 STUB = PROJECT / "tests" / "units" / "randstub.c"
 DELAY_STUB = PROJECT / "tests" / "units" / "delaystub.c"
+DELAY_SYMBOL = "CRT_$$_DELAY$WORD"
 
 # The System PRNG entry points to redirect, matching the symbols FPC
 # emits (see nm on a linked build).
@@ -47,6 +48,7 @@ def build(out_dir: Path, fpc: str) -> Path:
         f"-FU{out_dir}", f"-FE{out_dir}",
     ]
     command += [f"-k--wrap={symbol}" for symbol in RAND_SYMBOLS]
+    command.append(f"-k--wrap={DELAY_SYMBOL}")
     command += [f"-k{out_dir / 'randstub.o'}", f"-k{out_dir / 'delaystub.o'}"]
     command.append(str(SOURCES / "BOMBKI.PAS"))
     print("+", subprocess.list2cmdline(command), file=sys.stderr)
