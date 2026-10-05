@@ -68,6 +68,47 @@ instead, except when reproducing a direct quotation verbatim.
   grep it) to see the results and failures. Never
   rerun a test suite merely to view its output; rerun
   only to reproduce a failure after changing code.
+- **Never run more than one scenario at a time.** One
+  scenario per invocation, serially, never a loop and
+  never in parallel. Scenarios are interactive PTY
+  sessions against a real game process; running several
+  at once starves the machine (each one is
+  latency-sensitive, so timing-sensitive steps fail
+  spuriously) and makes CPU and wall-clock cost
+  unpredictable. If several scenarios need checking,
+  run them one after another, one command at a time.
+
+## Test execution modes
+
+Two separate ways to execute the tests. They have
+different purposes; do not mix them up.
+
+1. **Development runs (the default while working).**
+   Fast, approximate execution of the modded FPC-based
+   native executable. The native build stubs out `crt.Delay`
+   (a link-time `--wrap` plus a no-op stub, as
+   `tests/units/delaystub.c` does for the unit tests), so
+   gameplay timing is compressed and individual scenarios
+   finish in seconds instead of minutes. This is what to
+   use while writing or debugging scenarios, and it is the
+   only mode in which scenarios may be run repeatedly.
+   Faster but not faithful: compressed timing can hide
+   real-timing bugs and its timing-dependent branches do
+   not always match the original.
+
+2. **Full-fidelity CI runs.** 100% machine-accurate
+   execution: the original `BOMBKI.EXE` and the genuine
+   TP7 rebuild under DOSEMU2 (`tests/dosemu_scenarios.py`,
+   `tests/dosemu_game.sh`, `tests/expect_pty.py --pyte`),
+   with the real `Delay` timing. These scripts are the
+   acceptance gate and run **only after coverage has
+   reached 100%** - not during ordinary development.
+
+So: use the fast native mode for development iteration;
+use the DOSEMU2 + original-EXE mode for the final gate once
+coverage is complete. A scenario that passes only in one
+of the two is not yet trustworthy; report which mode a
+result came from.
 
 ## Autonomy
 

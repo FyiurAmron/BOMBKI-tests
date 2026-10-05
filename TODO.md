@@ -44,7 +44,15 @@ This file lists only remaining work.
    coverage (PRZEDM.PAS 170 -> 1259 of 1259 reachable lines;
    the WALKA tests
    run in milliseconds because the runner links a Delay
-   stub that wraps the crt unit's Delay). PRZEDM's SMIERC is
+   stub that wraps the crt unit's Delay). Two execution
+   modes, per AGENTS.md: development runs use the modded
+   FPC native build with a stubbed crt.Delay (fast and
+   approximate, the only mode for repeated scenario runs),
+   while the full-fidelity acceptance gate runs the
+   original EXE and the genuine TP7 build under DOSEMU2
+   with real timing, and runs only once coverage reaches
+   100%. Never run more than one scenario at a time.
+   PRZEDM's SMIERC is
    never called in the original and is not in the unit
    interface, so no test can reach it; the coverage tool
    excludes such never-called procedures instead of changing
