@@ -113,6 +113,19 @@ different purposes; do not mix them up.
    real-timing bugs and its timing-dependent branches do
    not always match the original.
 
+   The development build also replaces the PRNG. The game seeds
+   Random from the clock, so the executable draws a different
+   sequence depending on when it starts; a scenario whose
+   outcome depends on a roll then passes on one run and times
+   out on the next. `tools/build_dev_game.py` links
+   `tests/units/randstub.c` over the four System PRNG entry
+   points, which makes the sequence reproducible and lets a
+   scenario pin the one it depends on with the `BOMBKI_SEED`
+   environment variable (decimal or `0x` hex). The generator
+   keeps its state between calls, so draws still differ from
+   each other. Reach for this whenever a scenario is flaky for
+   reasons that are not a genuine bug in the game.
+
 2. **Full-fidelity CI runs.** 100% machine-accurate
    execution: the original `BOMBKI.EXE` and the genuine
    TP7 rebuild under DOSEMU2 (`tests/dosemu_scenarios.py`,
