@@ -48,12 +48,12 @@ Build the native Linux executable:
 python3 tools/build_fpc.py --target linux
 ```
 
-Run the prompt-driven native MODE smoke test (after building):
+Run the prompt-driven native MODE scenario (after building):
 
 ```sh
 python3 tests/expect_pty.py build/fpc/BOMBKI-linux-x86_64 \
-  tests/scenarios/mode-smoke.json \
-  --log build/pty-native/mode-smoke.jsonl
+  tests/scenarios/mode.json \
+  --log build/pty-native/mode.jsonl
 ```
 
 Measure host-native FPC line coverage with Callgrind (all
