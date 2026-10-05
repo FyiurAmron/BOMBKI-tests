@@ -42,6 +42,15 @@ DEBUG_FLAGS = ("-g",)
 UNCOVERED_PREVIEW = 40
 DELAYSTUB = UNIT_TEST_DIR / "delaystub.c"
 DELAY_SYMBOL = "CRT_$$_DELAY$WORD"
+RANDSTUB = UNIT_TEST_DIR / "randstub.c"
+# The System PRNG entry points, as FPC mangles them (see nm on a
+# linked build). Wrapping them makes a run reproducible.
+RAND_SYMBOLS = (
+    "SYSTEM_$$_RANDOMIZE",
+    "SYSTEM_$$_RANDOM$LONGINT$$LONGINT",
+    "SYSTEM_$$_RANDOM$INT64$$INT64",
+    "SYSTEM_$$_RANDOM$$EXTENDED",
+)
 SUMMARY = re.compile(r"tests: (\d+), failures: (\d+)")
 # Procedures the original binary never calls. They are absent
 # from their unit interface, so no test can reach them and they
@@ -84,16 +93,23 @@ def find_executable(name: str) -> str:
 def build_game(fpc: str, game_dir: Path) -> Path:
     """Build the host-native executable with DWARF line information.
 
-    crt.Delay is wrapped to a no-op for the program link, the same
-    way the unit-test binaries are built. Coverage measures which
-    lines execute, not how long they sleep, and the real two-second
-    combat delay would add minutes per fight-heavy scenario. This is
-    the modded development build; full-fidelity timing is exercised
-    separately by the DOSEMU2 gate (see AGENTS.md).
+    crt.Delay is wrapped to a no-op for the program link, and the
+    System PRNG entry points are wrapped to a seeded generator, the
+    same way the unit-test binaries stub Delay. Coverage measures
+    which lines execute, not how long they sleep, and the real
+    two-second combat delay would add minutes per fight-heavy
+    scenario. Seeding matters here too: the game samples the clock,
+    so a roll-dependent branch may or may not be taken on a given
+    run and the reported coverage would drift. This is the modded
+    development build; full-fidelity timing and the original PRNG are
+    exercised separately by the DOSEMU2 gate (see AGENTS.md).
     """
     game_dir.mkdir(parents=True, exist_ok=True)
     stub = build_delay_stub(game_dir)
+    rand_stub = build_rand_stub(game_dir)
     link_args = [f"-k--wrap={DELAY_SYMBOL}", f"-k{stub}"]
+    link_args += [f"-k--wrap={symbol}" for symbol in RAND_SYMBOLS]
+    link_args.append(f"-k{rand_stub}")
     for name in (*UNIT_NAMES, PROGRAM_NAME):
         source = SOURCES / f"{name}.PAS"
         command = [
@@ -162,6 +178,18 @@ def build_delay_stub(build_dir: Path) -> Path:
         raise RuntimeError("no C compiler (cc or gcc) for the Delay stub")
     obj = build_dir / "delaystub.o"
     command = [cc, "-c", str(DELAYSTUB), "-o", str(obj)]
+    print("+", subprocess.list2cmdline(command))
+    subprocess.run(command, check=True)
+    return obj
+
+
+def build_rand_stub(build_dir: Path) -> Path:
+    """Compile the seeded-PRNG stub so the link can --wrap Random."""
+    cc = shutil.which("cc") or shutil.which("gcc")
+    if cc is None:
+        raise RuntimeError("no C compiler (cc or gcc) for the PRNG stub")
+    obj = build_dir / "randstub.o"
+    command = [cc, "-c", str(RANDSTUB), "-o", str(obj)]
     print("+", subprocess.list2cmdline(command))
     subprocess.run(command, check=True)
     return obj
