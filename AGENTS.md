@@ -78,6 +78,23 @@ instead, except when reproducing a direct quotation verbatim.
   unpredictable. If several scenarios need checking,
   run them one after another, one command at a time.
 
+## Scenarios
+
+`tests/scenarios/*.json` drives the game through a PTY: each
+step waits for an `expect` regex and then sends a command.
+Naming carries no meaning beyond that, so keep it plain and
+consistent:
+
+- `<area>-tour.json` - a generated room-graph walk produced by
+  `tools/gen_tour_scenarios.py`, which derives the route from
+  the reconstructed sources.
+- `<what-it-covers>.json` - a targeted scenario, hand-written or
+  produced by a generator such as `tools/gen_level_up_scenario.py`.
+
+Do not add a `-smoke` suffix: it used to decorate a handful of
+early scenarios, it does not distinguish anything, and it was
+dropped from all of them.
+
 ## Test execution modes
 
 Two separate ways to execute the tests. They have

@@ -13,11 +13,11 @@
     { "label": "train strength three times", "expect": "TRENUJESZ SILE[\\s\\S]*?[0-9]+%\\.-?[0-9]+>", "send": "ZACHOD" },
     { "label": "back to the salon", "expect": "JESTES W OKROGLYM SALONIE[\\s\\S]*?[0-9]+%\\.-?[0-9]+>", "send": "DOL" },
     { "label": "meditation room", "expect": "ZSZEDLES NA DOL GDZIE TRENUJE[\\s\\S]*?[0-9]+%\\.-?[0-9]+>", "send": "CWICZ KOPAC" },
-    { "label": "learn digging", "expect": "CWICZYSZ KOPANIE[\\s\\S]*?[0-9]+%\\.-?[0-9]+>", "send": "MODE" },
+    { "label": "learn KOP", "expect": "CWICZYSZ KOPANIE[\\s\\S]*?[0-9]+%\\.-?[0-9]+>", "send": "MODE" },
     { "label": "ground prompt", "expect": "[0-9]+%\\.-?[0-9]+>", "send": "KOP" },
-    { "label": "dig amount prompt", "expect": "1\\)PONIZEJ JAKIEJ ENERGI CHCESZ ZACZAC KOPAC", "send": "20" },
-    { "label": "mana amount prompt", "expect": "2\\)DO JAKIECH ILOSCI MANA CHCESZ KOPAC", "send": "0" },
-    { "label": "digging finished", "expect": "[\\s\\S]*?[0-9]+%\\.-?[0-9]+>", "send": "UNMODE" },
+    { "label": "kick energy prompt", "expect": "1\\)PONIZEJ JAKIEJ ENERGI CHCESZ ZACZAC KOPAC", "send": "20" },
+    { "label": "kick mana prompt", "expect": "2\\)DO JAKIECH ILOSCI MANA CHCESZ KOPAC", "send": "0" },
+    { "label": "kick finished", "expect": "[\\s\\S]*?[0-9]+%\\.-?[0-9]+>", "send": "UNMODE" },
     { "label": "restored meditation room", "expect": "ZSZEDLES NA DOL GDZIE TRENUJE[\\s\\S]*?[0-9]+%\\.-?[0-9]+>", "send": "WYJSCIE" }
   ]
 }
