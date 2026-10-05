@@ -31,8 +31,13 @@
       "send": "POLNOC"
     },
     {
-      "label": "city centre, then the shopping street",
+      "label": "city centre, read the poster",
       "expect": "JESTES\\ W\\ CENTRUM\\ MIAST[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
+      "send": "PATRZ PLAKAT"
+    },
+    {
+      "label": "city centre, then the shopping street",
+      "expect": "[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
       "send": "POLNOC"
     },
     {
