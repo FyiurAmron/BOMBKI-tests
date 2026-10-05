@@ -82,15 +82,28 @@ def find_executable(name: str) -> str:
 
 
 def build_game(fpc: str, game_dir: Path) -> Path:
-    """Build the host-native executable with DWARF line information."""
+    """Build the host-native executable with DWARF line information.
+
+    crt.Delay is wrapped to a no-op for the program link, the same
+    way the unit-test binaries are built. Coverage measures which
+    lines execute, not how long they sleep, and the real two-second
+    combat delay would add minutes per fight-heavy scenario. This is
+    the modded development build; full-fidelity timing is exercised
+    separately by the DOSEMU2 gate (see AGENTS.md).
+    """
     game_dir.mkdir(parents=True, exist_ok=True)
+    stub = build_delay_stub(game_dir)
+    link_args = [f"-k--wrap={DELAY_SYMBOL}", f"-k{stub}"]
     for name in (*UNIT_NAMES, PROGRAM_NAME):
         source = SOURCES / f"{name}.PAS"
         command = [
             fpc, "-B", "-Mtp", "-Tlinux", "-Px86_64", *DEBUG_FLAGS,
             f"-Fu{SOURCES}", f"-Fu{game_dir}",
-            f"-FU{game_dir}", f"-FE{game_dir}", str(source),
+            f"-FU{game_dir}", f"-FE{game_dir}",
         ]
+        if name == PROGRAM_NAME:
+            command.extend(link_args)
+        command.append(str(source))
         print("+", subprocess.list2cmdline(command))
         subprocess.run(command, cwd=game_dir, check=True)
     binary = game_dir / PROGRAM_NAME
