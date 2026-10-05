@@ -123,6 +123,11 @@
     {
       "label": "room 61 (KIEDY PODSZEDLES BLI)",
       "expect": "KIEDY PODSZEDLES BLIZEJ ZBARANIALES - [\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
+      "send": "PATRZ PLAKAT"
+    },
+    {
+      "label": "room 61 exits",
+      "expect": "[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
       "send": "EXIT"
     },
     {
@@ -233,6 +238,11 @@
     {
       "label": "room 68 (TO JEST WEJSCIE NA S)",
       "expect": "TO JEST WEJSCIE NA SCENE NA KTOREJ TAN[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
+      "send": "PATRZ TABLICZKA"
+    },
+    {
+      "label": "room 68 exits",
+      "expect": "[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
       "send": "EXIT"
     },
     {

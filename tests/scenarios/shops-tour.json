@@ -76,6 +76,11 @@
       "send": "LISTA"
     },
     {
+      "label": "room 25: PATRZ POSTER",
+      "expect": "[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
+      "send": "PATRZ POSTER"
+    },
+    {
       "label": "room 25 exits",
       "expect": "[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
       "send": "EXIT"
@@ -164,6 +169,11 @@
       "label": "room 24 (JESTES W ZBROJOWNI -)",
       "expect": "JESTES W ZBROJOWNI - SKLEP NIEDAWNO ZO[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
       "send": "LISTA"
+    },
+    {
+      "label": "room 24: PATRZ PLAKAT",
+      "expect": "[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
+      "send": "PATRZ PLAKAT"
     },
     {
       "label": "room 24 exits",

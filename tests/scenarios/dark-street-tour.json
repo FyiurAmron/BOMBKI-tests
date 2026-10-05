@@ -63,6 +63,16 @@
     {
       "label": "room 76 (JESTES W BARZE POD D)",
       "expect": "JESTES W BARZE POD DWOMA PEDALAMI CHCA[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
+      "send": "LISTA"
+    },
+    {
+      "label": "room 76: MAM 18 LAT",
+      "expect": "[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
+      "send": "MAM 18 LAT"
+    },
+    {
+      "label": "room 76 exits",
+      "expect": "[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
       "send": "EXIT"
     },
     {
@@ -133,6 +143,11 @@
     {
       "label": "room 80 (CHOC TO MALO PRAWDOP)",
       "expect": "CHOC TO MALO PRAWDOPODOBNE TUTAJ JEST [\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
+      "send": "PATRZ NAPIS"
+    },
+    {
+      "label": "room 80 exits",
+      "expect": "[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
       "send": "EXIT"
     },
     {

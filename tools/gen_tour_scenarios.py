@@ -193,7 +193,11 @@ def main():
     kill = "ZABIJ POTWOR"
     plans = {
         # Training rooms and the four bare rooms around the school.
-        "school-tour.json": ([3, 2, 4, 5, 10, 7, 8, 6, 9], {}),
+        # Room 2 has a poster of its own: the three lines that name
+        # the skills to train together. Room 3 shows the full skill
+        # list instead.
+        "school-tour.json": ([3, 2, 4, 5, 10, 7, 8, 6, 9],
+                             {2: ["PATRZ PLAKAT"]}),
         # The cage corridor and its cages. Room 16 runs WALKA on
         # every command, so it is skipped here; the cage fights get
         # their own scenario. The corridor is left through 17 to the
@@ -201,19 +205,30 @@ def main():
         "cages-tour.json": ([11, 12, 14, 15, 13, 17, 1], {}),
         # City centre and the four shops (23 bakery, 24 armory,
         # 25 general store, 26 magic shop). POL-ELF starts with 30
-        # coins, so only the cheapest food is affordable.
+        # coins, so only the cheapest food is affordable. The
+        # armory poster and the general store advert are separate
+        # texts from the four price lists.
         "shops-tour.json": ([21, 22, 25, 26, 23, 24],
-                            {23: ["LISTA", "KUP PACZEK"], 24: ["LISTA"],
-                             25: ["LISTA"], 26: ["LISTA"]}),
+                            {23: ["LISTA", "KUP PACZEK"],
+                             24: ["LISTA", "PATRZ PLAKAT"],
+                             25: ["LISTA", "PATRZ POSTER"],
+                             26: ["LISTA"]}),
         # The concert hall: the street, the fun-fair valley, the
-        # crowd block (rooms 61 to 72) and the arena approach.
+        # crowd block (rooms 61 to 72) and the arena approach. The
+        # entrance poster and the dressing-room notice board are the
+        # two texts the block adds to the bare room intros.
         "concert-tour.json": ([30, 31, 32, 60, 61, 62, 63, 64, 65, 66, 67, 68,
-                               69, 70, 71, 72], {}),
-        # The dark street and the cave behind it. Room 88 is the
+                               69, 70, 71, 72],
+                              {61: ["PATRZ PLAKAT"], 68: ["PATRZ TABLICZKA"]}),
+        # The dark street and the cave behind it. The bar sells a
+        # drink list and answers a question about the name, and the
+        # well room has a barely legible sign. Room 88 is the
         # twenty-times-bigger POKRZYWA boss: it fights on entry with
         # no way to decline, so it needs its own prepared scenario.
         "dark-street-tour.json": ([75, 76, 77, 78, 79, 80, 81, 82, 83, 84,
-                                   85, 87], {}),
+                                   85, 87],
+                                  {76: ["LISTA", "MAM 18 LAT"],
+                                   80: ["PATRZ NAPIS"]}),
         # The quest-master's road, reached from the shopping street.
         "quest-road-tour.json": ([100], {}),
         # The cage fights. OLBRZYM has the highest starting SIL, so
