@@ -6,9 +6,9 @@ This file lists only remaining work.
 
 1. **Coverage growth**: PRZEDM.PAS, MONSTRA.PAS, and SWIAT.PAS
    are at 100% of their reachable lines. The reproducible total is
-   **90.14%** (BOMBKI.PAS 81.92%, 359 of its lines remaining),
+   **95.69%** (BOMBKI.PAS 92.09%, 157 of its lines remaining),
    measured by `python3 tools/coverage_callgrind.py
-   --dump-uncovered` over 31 scenarios plus the Pascal unit
+   --dump-uncovered` over 39 scenarios plus the Pascal unit
    tests. That figure is stable: two consecutive runs give a
    byte-identical uncovered set, because the coverage build stubs
    both crt.Delay and the System PRNG (`tools/build_dev_game.py`),
