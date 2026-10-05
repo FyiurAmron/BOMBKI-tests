@@ -161,6 +161,16 @@
       "send": "MODE"
     },
     {
+      "label": "ground prompt with the gift beer",
+      "expect": "[0-9]+%\\.-?[0-9]+>",
+      "send": "JA"
+    },
+    {
+      "label": "the sheet counts the gift beer",
+      "expect": "OZEWIAJACE PIWSKO[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
+      "send": "UZYJ PIWO"
+    },
+    {
       "label": "ground, drink the beer",
       "expect": "[0-9]+%\\.-?[0-9]+>",
       "send": "UZYJ PIWO"
