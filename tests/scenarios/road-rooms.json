@@ -66,23 +66,38 @@
       "send": "ZACHOD"
     },
     {
-      "label": "the road",
+      "label": "the road, exit list",
       "expect": "IDZIESZ\\ DROGA\\ ,\\ MIASTA[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
+      "send": "EXIT"
+    },
+    {
+      "label": "the road",
+      "expect": "[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
       "send": "PATRZ DROGOWSKAZ"
     },
     {
-      "label": "signpost text",
-      "expect": "WSCHOD - MIASTO , ZACHOD - SHIGGHLERATHR[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
+      "label": "signpost text, head west",
+      "expect": "WSCHOD\\ -\\ MIASTO[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
       "send": "ZACHOD"
+    },
+    {
+      "label": "stony road, exit list",
+      "expect": "IDZIESZ\\ DALEJ\\ KAMIENIS[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
+      "send": "EXIT"
     },
     {
       "label": "stony road",
-      "expect": "IDZIESZ\\ DALEJ\\ KAMIENIS[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
+      "expect": "[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
       "send": "ZACHOD"
     },
     {
+      "label": "road ends at the river, exit list",
+      "expect": "CO\\ TO\\ ZA\\ GLUPOTA[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
+      "send": "EXIT"
+    },
+    {
       "label": "road ends at the river",
-      "expect": "CO\\ TO\\ ZA\\ GLUPOTA\\ \\?\\ DRO[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
+      "expect": "[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
       "send": "WSCHOD"
     },
     {
