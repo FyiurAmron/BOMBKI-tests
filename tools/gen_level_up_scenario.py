@@ -70,72 +70,137 @@ def thresholds() -> dict[int, int]:
     return {n: need(n) for n in range(1, 30)}
 
 
-def main() -> None:
-    need = thresholds()
-    target = 14
-    # One grant per visit is not enough for the 700+ thresholds,
-    # so give each visit enough grants to clear that level, then
-    # leave and come back to force the next pass.
+def route_graph() -> tuple[dict, dict]:
+    """The room graph and per-room intro text, from the sources.
+
+    Reused from gen_tour_scenarios so the cave route here cannot
+    drift from the code or from the other generated tours.
+    """
+    from gen_tour_scenarios import extract
+    return extract()
+
+
+def prefix(race: str, escape: bool = False) -> list[dict]:
+    """Steps from a fresh game to the old man's room, granting KUNSZT.
+
+    With escape, the route trains the flee skill (UFOK reaches
+    MAD > 10 and ZRE > 10 cheaply) and runs from the DRZWI,
+    which costs a handful of rounds. Otherwise the DRZWI is
+    fought through: slower, but no dice roll in it, so the
+    scenario does not go flaky.
+    """
+    flee = escape
+    graph, texts = route_graph()
+    # A fleeing character needs ZWIEJ > 0 before the ZWIEJ command
+    # will prompt for WIMP. CWICZ UCIEKAC needs MAD > 10 and
+    # ZRE > 10, so UFOK trains ZRE once past that gate first.
+    train: list[dict] = []
+    if flee:
+        train = [
+            {"label": "in the salon, head for the strength room",
+             "expect": f"{texts[1]}[\\s\\S]*?{PROMPT}", "send": "WSCHOD"},
+            {"label": "strength room",
+             "expect": f"{texts[2]}[\\s\\S]*?{PROMPT}", "send": "TRENUJ ZRECZNOSC"},
+            {"label": "train agility to 10",
+             "expect": f"TRENUJESZ ZRECZNOSC I MASZ 10 ZRECZNOSCI[\\s\\S]*?{PROMPT}",
+             "send": "TRENUJ ZRECZNOSC"},
+            {"label": "train agility to 11, past the ZRE > 10 gate",
+             "expect": f"TRENUJESZ ZRECZNOSC I MASZ 11 ZRECZNOSCI[\\s\\S]*?{PROMPT}",
+             "send": "ZACHOD"},
+            {"label": "back to the salon",
+             "expect": f"JESTES W OKROGLYM SALONIE[\\s\\S]*?{PROMPT}", "send": "DOL"},
+            {"label": "meditation room",
+             "expect": f"ZSZEDLES NA DOL GDZIE TRENUJE[\\s\\S]*?{PROMPT}",
+             "send": "CWICZ UCIEKAC"},
+            {"label": "learn fleeing",
+             "expect": f"CWICZYSZ UCIEKANIE[\\s\\S]*?{PROMPT}", "send": "GORA"},
+            {"label": "back at the salon",
+             "expect": f"JESTES W OKROGLYM SALONIE[\\s\\S]*?{PROMPT}",
+             "send": "POLNOC"},
+        ]
     steps: list[dict] = [
         {"label": "intro tick", "expect": "TICK !!!", "send": ""},
-        {"label": "race prompt", "expect": "NAPISZ SWA RASE", "send": "UFOK"},
+        {"label": "race prompt", "expect": "NAPISZ SWA RASE", "send": race},
         {"label": "player-name prompt", "expect": "PODAJE SWE IMIE",
          "send": "TESTER"},
         {"label": "startup key read",
          "expect": "ABY SIE PATRZEC UZYJ KOMENDY PATRZ", "send": ""},
         {"label": "first room", "expect": f"TU ZACZYNA SIE GRE[\\s\\S]*?{PROMPT}",
          "send": "POLNOC"},
-        {"label": "round salon", "expect": f"JESTES W OKROGLYM SALONIE[\\s\\S]*?{PROMPT}",
-         "send": "WSCHOD"},
-        {"label": "strength room", "expect": f"JESTES W POKOJU GDZIE RAMBO TRENUJE[\\s\\S]*?{PROMPT}",
-         "send": "TRENUJ ZRECZNOSC"},
-        {"label": "train agility to 10", "expect": f"TRENUJESZ ZRECZNOSC I MASZ 10 ZRECZNOSCI[\\s\\S]*?{PROMPT}",
-         "send": "TRENUJ ZRECZNOSC"},
-        {"label": "train agility to 11, past the ZRE > 10 gate",
-         "expect": f"TRENUJESZ ZRECZNOSC I MASZ 11 ZRECZNOSCI[\\s\\S]*?{PROMPT}",
-         "send": "ZACHOD"},
-        {"label": "back to the salon", "expect": f"JESTES W OKROGLYM SALONIE[\\s\\S]*?{PROMPT}",
-         "send": "DOL"},
-        {"label": "meditation room", "expect": f"ZSZEDLES NA DOL GDZIE TRENUJE[\\s\\S]*?{PROMPT}",
-         "send": "CWICZ UCIEKAC"},
-        {"label": "learn fleeing", "expect": f"CWICZYSZ UCIEKANIE[\\s\\S]*?{PROMPT}",
-         "send": "GORA"},
-        {"label": "back at the salon", "expect": f"JESTES W OKROGLYM SALONIE[\\s\\S]*?{PROMPT}",
-         "send": "POLNOC"},
-        {"label": "city centre", "expect": f"JESTES W CENTRUM MIASTA[\\s\\S]*?{PROMPT}",
-         "send": "WSCHOD"},
-        {"label": "dark street", "expect": f"JESTES NA ULICY CIEMNEJ[\\s\\S]*?{PROMPT}",
-         "send": "POLODNIE"},
-        {"label": "bluszcz", "expect": f"ZNALAZLES SIE WSROD BLUSZCZU[\\s\\S]*?{PROMPT}",
-         "send": "POLODNIE"},
-        {"label": "flower thicket", "expect": f"CHOC TO MALO PRAWDOPODOBNE[\\s\\S]*?{PROMPT}",
-         "send": "POLODNIE"},
-        {"label": "bluszcz clearing", "expect": f"\\.\\.\\.\\.\\.\\.\\. PIERDUT[\\s\\S]*?{PROMPT}",
-         "send": "ZACHOD"},
-        {"label": "cave entrance", "expect": f"TO CIEKAWE ZE WCZESNIEJ[\\s\\S]*?{PROMPT}",
-         "send": "ZACHOD"},
-        {"label": "living door, DRZWI bar the way",
-         "expect": f"{DOOR}[\\s\\S]*?TE DRZWI ZYJA[\\s\\S]*?NIE WPUSZCZE[\\s\\S]*?{PROMPT}",
-         "send": "MODE"},
-        {"label": "ground prompt in the living-door room",
-         "expect": PROMPT, "send": "ZWIEJ"},
-        {"label": "flee threshold prompt",
-         "expect": r"PONIZEJ ILU ENERGII CHCESZ UCIEKAC\?", "send": "500"},
-        {"label": "threshold set above current energy", "expect": PROMPT,
-         "send": "DAWAJ EN"},
-        {"label": "energy topped to keep ENERGIA < WIMP", "expect": PROMPT,
-         "send": "DAWAJ EN"},
-        {"label": "energy 450", "expect": PROMPT, "send": "UNMODE"},
-        {"label": "back at the living door",
-         "expect": f"{DOOR}[\\s\\S]*?TE DRZWI ZYJA[\\s\\S]*?{PROMPT}",
-         "send": "ZABIJ DRZWI"},
-        {"label": "escape the fight",
-         "expect": f"[\\s\\S]*?WSTYD !!! UCIEKLES Z POLA BITWY[\\s\\S]*?{PROMPT}",
-         "send": "ZACHOD"},
-        {"label": "past the DRZWI into the dark room",
-         "expect": f"{DARK}[\\s\\S]*?STARUCHA[\\s\\S]*?{PROMPT}",
-         "send": "DAWAJ KUNSZT"},
     ]
+    steps += train
+    # The training detour ends in the salon; the non-flee route is
+    # already there. Both continue along the same cave route, which
+    # is taken from the room graph rather than written out by hand:
+    # salon -> city centre -> dark street -> bluszcz -> flowers ->
+    # clearing -> cave -> living door.
+    # The harness matches a step's expect against the output the
+    # previous step's send produced, so a step's expect names the
+    # room the player is standing in and its send is the movement
+    # that leaves that room. Walking the graph from the salon,
+    # assert each room and send the way onward.
+    # Training ends by sending POLNOC, so a fleeing character is
+    # already in the city centre; the others are still in the
+    # salon. Start the cave route from wherever we stand.
+    here = 20 if flee else 1
+    onward = tuple(r for r in (20, 75, 77, 80, 83, 84) if r != here)
+    for room in onward:
+        direction = next(d for d, dest in graph[here].items() if dest == room)
+        steps.append({"label": f"in room {here}",
+                      "expect": f"{texts[here]}[\\s\\S]*?{PROMPT}",
+                      "send": direction})
+        here = room
+    steps.append({"label": "in the cave entrance room 84",
+                  "expect": f"{texts[84]}[\\s\\S]*?{PROMPT}", "send": "ZACHOD"})
+    steps.append({"label": "living door, DRZWI bar the way",
+                  "expect": f"{DOOR}[\\s\\S]*?TE DRZWI ZYJA[\\s\\S]*?"
+                            f"NIE WPUSZCZE[\\s\\S]*?{PROMPT}",
+                  "send": "MODE"})
+    if flee:
+        steps += [
+            {"label": "ground prompt in the living-door room",
+             "expect": PROMPT, "send": "ZWIEJ"},
+            {"label": "flee threshold prompt",
+             "expect": r"PONIZEJ ILU ENERGII CHCESZ UCIEKAC\?", "send": "500"},
+            {"label": "threshold set above current energy", "expect": PROMPT,
+             "send": "DAWAJ EN"},
+            {"label": "energy topped to keep ENERGIA < WIMP", "expect": PROMPT,
+             "send": "DAWAJ EN"},
+            {"label": "energy 450", "expect": PROMPT, "send": "UNMODE"},
+            {"label": "back at the living door",
+             "expect": f"{DOOR}[\\s\\S]*?TE DRZWI ZYJA[\\s\\S]*?{PROMPT}",
+             "send": "ZABIJ DRZWI"},
+            {"label": "escape the fight",
+             "expect": f"[\\s\\S]*?WSTYD !!! UCIEKLES Z POLA BITWY[\\s\\S]*?{PROMPT}",
+             "send": "ZACHOD"},
+        ]
+    else:
+        # No flee skill: top up energy so the undodgeable tree
+        # fight stays winnable. Keep this small - DAWAJ EN adds 200
+        # per command and the MAXE clamp only runs at the pass top,
+        # so a long run in the ground block overflows the Integer.
+        steps += [{"label": f"energy top-up {i + 1}",
+                   "expect": PROMPT, "send": "DAWAJ EN"}
+                  for i in range(3)]
+        steps.append({"label": "back in the room", "expect": PROMPT,
+                      "send": "UNMODE"})
+        steps += [
+            {"label": "back at the living door",
+             "expect": f"{DOOR}[\\s\\S]*?TE DRZWI ZYJA[\\s\\S]*?{PROMPT}",
+             "send": "ZABIJ DRZWI"},
+            {"label": "defeat the DRZWI",
+             "expect": f"[\\s\\S]*?ZABILES GO[\\s\\S]*?{PROMPT}", "send": "ZACHOD"},
+        ]
+    steps.append({"label": "past the DRZWI into the dark room",
+                  "expect": f"{DARK}[\\s\\S]*?STARUCHA[\\s\\S]*?{PROMPT}",
+                  "send": "DAWAJ KUNSZT"})
+    return steps
+
+
+def main() -> None:
+    need = thresholds()
+    target = 14
+    steps = prefix("UFOK", escape=True)
 
     level = 1
     visit = 0
@@ -185,12 +250,91 @@ def main() -> None:
     steps.append({"label": "leave the room at the end",
                   "expect": PROMPT, "send": "WYJSCIE"})
 
-    path = OUT / "level-up-smoke.json"
+    path = OUT / "level-up.json"
     path.write_text(json.dumps({"steps": steps}, indent=2) + "\n",
                     encoding="utf-8")
     print(f"{path.name}: {len(steps)} steps, {visit} visits, "
           f"levels 1..{target}, thresholds "
           f"{[need[n] for n in range(1, target)]}")
+
+    # The level-12 block distributes MAXSIL/MAXZRE/MAXMAD by
+    # comparing them, and each ordering of the three takes a
+    # different branch. A single race only produces one ordering,
+    # so one extra scenario per reachable ordering. The MAX values
+    # below are read from WybierzRase and the 1415-1420 gates.
+    variants = {
+        # Starts 15/15/15; every gate adds the same amount, so all
+        # three stay equal -> the "all +1" branch.
+        "level-max-equal.json": ("CZLOWIEK", "all three MAX equal"),
+        # Starts 20/20/7; MAXZRE ties MAXSIL on top -> the
+        # "MAXSIL + 2 / MAXZRE + 1" branch.
+        "level-max-zretie.json": ("OLBRZYM", "MAXZRE ties MAXSIL", True),
+        # Starts 15/20/11; after the gates MAXZRE is strictly highest
+        # -> the "MAXZRE + 3" branch. NIMFA rather than POL-ELF,
+        # which also reaches it but has too little SIL to win the
+        # DRZWI fight at level one.
+        "level-max-zre-top.json": ("NIMFA", "MAXZRE on top"),
+        # Starts 13/14/20; after the gates MAXMAD is strictly
+        # highest -> the "MAXMAD + 3" branch, the last ordering in
+        # the level-12 block that no other race reaches.
+        "level-max-mad-top.json": ("UFOK", "MAXMAD on top", False, False),
+    }
+    for name, spec in variants.items():
+        race, note = spec[0], spec[1]
+        second_pass = spec[2] if len(spec) > 2 else False
+        escape = spec[3] if len(spec) > 3 else False
+        variant = prefix(race, escape=escape)
+        # Level up to 12 so the MAX-ordering block runs. Only the
+        # last pass before level 12 matters here, so the banner is
+        # only asserted on that one, not on every level.
+        level = 1
+        while level < 12:
+            threshold = need[level]
+            grants = -(-threshold // 500)
+            for index in range(1, grants):
+                variant.append({"label": f"level {level + 1}: grant "
+                                         f"{index + 1}/{grants}",
+                                "expect": PROMPT, "send": "DAWAJ KUNSZT"})
+            variant.append({"label": f"level {level + 1}: MODE",
+                            "expect": PROMPT, "send": "MODE"})
+            variant.append({"label": f"level {level + 1}: UNMODE",
+                            "expect": PROMPT, "send": "UNMODE"})
+            variant.append({
+                "label": f"level {level + 1}: banner, then grant 1/{grants}",
+                "expect": (f"{TWELFTH}[\\s\\S]*?MASZ TERAZ"
+                           if level == 11 else BANNER),
+                "send": "DAWAJ KUNSZT"})
+            level += 1
+        if second_pass:
+            # The level-12 block runs every time POZIOM becomes 12,
+            # and ZABIJ STARUCH in this same room drops POZIOM by
+            # one, so a second trip through 12 re-runs the block on
+            # MAX values the first pass already shifted. For
+            # OLBRZYM the first pass takes the MAXZRE/MAXSIL tie
+            # branch and leaves MAXZRE below MAXSIL, so the second
+            # pass reports MAXSIL + 3 - an ordering no single pass
+            # of any starting race produces.
+            #
+            # Each expect sees the previous step's output, so the
+            # banner from a MODE/UNMODE pair lands on the step
+            # after it.
+            variant.append({"label": "staruch lowers POZIOM by one",
+                            "expect": PROMPT, "send": "ZABIJ STARUCH"})
+            variant.append({"label": "grant 1/2 back toward 12",
+                            "expect": PROMPT, "send": "DAWAJ KUNSZT"})
+            variant.append({"label": "grant 2/2 back toward 12",
+                            "expect": PROMPT, "send": "MODE"})
+            variant.append({"label": "UNMODE to force the pass",
+                            "expect": PROMPT, "send": "UNMODE"})
+            variant.append({
+                "label": "second trip through 12, now with MAXSIL on top",
+                "expect": f"{TWELFTH}[\\s\\S]*?MASZ TERAZ",
+                "send": "DAWAJ KUNSZT"})
+        variant.append({"label": "leave the room at the end",
+                        "expect": PROMPT, "send": "WYJSCIE"})
+        (OUT / name).write_text(json.dumps({"steps": variant}, indent=2) + "\n",
+                                encoding="utf-8")
+        print(f"{name}: {len(variant)} steps (race {race}, {note})")
 
 
 if __name__ == "__main__":
