@@ -151,8 +151,13 @@
       "send": "MODE"
     },
     {
-      "label": "visit 1: UNMODE to force the pass",
+      "label": "visit 1: ask who you are",
       "expect": "[0-9]+%\\.-?[0-9]+>",
+      "send": "JA"
+    },
+    {
+      "label": "visit 1: UNMODE to force the pass",
+      "expect": "JESTES\\ NA\\ PIERWSZYM\\ LEVELU",
       "send": "UNMODE"
     },
     {
@@ -171,8 +176,13 @@
       "send": "MODE"
     },
     {
-      "label": "visit 2: UNMODE to force the pass",
+      "label": "visit 2: ask who you are",
       "expect": "[0-9]+%\\.-?[0-9]+>",
+      "send": "JA"
+    },
+    {
+      "label": "visit 2: UNMODE to force the pass",
+      "expect": "JESTES\\ NA\\ DRUGIM\\ LEVELU",
       "send": "UNMODE"
     },
     {
@@ -191,8 +201,13 @@
       "send": "MODE"
     },
     {
-      "label": "visit 3: UNMODE to force the pass",
+      "label": "visit 3: ask who you are",
       "expect": "[0-9]+%\\.-?[0-9]+>",
+      "send": "JA"
+    },
+    {
+      "label": "visit 3: UNMODE to force the pass",
+      "expect": "JESTES\\ NA\\ TRZECIM\\ LEVELU",
       "send": "UNMODE"
     },
     {
@@ -211,8 +226,13 @@
       "send": "MODE"
     },
     {
-      "label": "visit 4: UNMODE to force the pass",
+      "label": "visit 4: ask who you are",
       "expect": "[0-9]+%\\.-?[0-9]+>",
+      "send": "JA"
+    },
+    {
+      "label": "visit 4: UNMODE to force the pass",
+      "expect": "JESTES\\ NA\\ CZWARTYM\\ LEVELU",
       "send": "UNMODE"
     },
     {
@@ -231,8 +251,13 @@
       "send": "MODE"
     },
     {
-      "label": "visit 5: UNMODE to force the pass",
+      "label": "visit 5: ask who you are",
       "expect": "[0-9]+%\\.-?[0-9]+>",
+      "send": "JA"
+    },
+    {
+      "label": "visit 5: UNMODE to force the pass",
+      "expect": "JESTES\\ NA\\ PIATYM\\ LEVELU",
       "send": "UNMODE"
     },
     {
@@ -251,8 +276,13 @@
       "send": "MODE"
     },
     {
-      "label": "visit 6: UNMODE to force the pass",
+      "label": "visit 6: ask who you are",
       "expect": "[0-9]+%\\.-?[0-9]+>",
+      "send": "JA"
+    },
+    {
+      "label": "visit 6: UNMODE to force the pass",
+      "expect": "JESTES\\ NA\\ SZ.STYM\\ LEVELU",
       "send": "UNMODE"
     },
     {
@@ -271,8 +301,13 @@
       "send": "MODE"
     },
     {
-      "label": "visit 7: UNMODE to force the pass",
+      "label": "visit 7: ask who you are",
       "expect": "[0-9]+%\\.-?[0-9]+>",
+      "send": "JA"
+    },
+    {
+      "label": "visit 7: UNMODE to force the pass",
+      "expect": "JESTES\\ NA\\ SIODMYM\\ LEVELU",
       "send": "UNMODE"
     },
     {
@@ -291,8 +326,13 @@
       "send": "MODE"
     },
     {
-      "label": "visit 8: UNMODE to force the pass",
+      "label": "visit 8: ask who you are",
       "expect": "[0-9]+%\\.-?[0-9]+>",
+      "send": "JA"
+    },
+    {
+      "label": "visit 8: UNMODE to force the pass",
+      "expect": "JESTES\\ NA\\ OSMYM\\ LEVELU",
       "send": "UNMODE"
     },
     {
@@ -311,8 +351,13 @@
       "send": "MODE"
     },
     {
-      "label": "visit 9: UNMODE to force the pass",
+      "label": "visit 9: ask who you are",
       "expect": "[0-9]+%\\.-?[0-9]+>",
+      "send": "JA"
+    },
+    {
+      "label": "visit 9: UNMODE to force the pass",
+      "expect": "JESTES\\ NA\\ DZIEWIATYM\\ LEVELU",
       "send": "UNMODE"
     },
     {
@@ -331,8 +376,13 @@
       "send": "MODE"
     },
     {
-      "label": "visit 10: UNMODE to force the pass",
+      "label": "visit 10: ask who you are",
       "expect": "[0-9]+%\\.-?[0-9]+>",
+      "send": "JA"
+    },
+    {
+      "label": "visit 10: UNMODE to force the pass",
+      "expect": "JESTES\\ NA\\ DZIESIATYM\\ LEVELU",
       "send": "UNMODE"
     },
     {
@@ -351,8 +401,13 @@
       "send": "MODE"
     },
     {
-      "label": "visit 11: UNMODE to force the pass",
+      "label": "visit 11: ask who you are",
       "expect": "[0-9]+%\\.-?[0-9]+>",
+      "send": "JA"
+    },
+    {
+      "label": "visit 11: UNMODE to force the pass",
+      "expect": "JESTES\\ NA\\ JEDENASTYM\\ LEVELU",
       "send": "UNMODE"
     },
     {
@@ -371,8 +426,13 @@
       "send": "MODE"
     },
     {
-      "label": "visit 12: UNMODE to force the pass",
+      "label": "visit 12: ask who you are",
       "expect": "[0-9]+%\\.-?[0-9]+>",
+      "send": "JA"
+    },
+    {
+      "label": "visit 12: UNMODE to force the pass",
+      "expect": "JESTES\\ NA\\ DWUNASTYM\\ LEVELU",
       "send": "UNMODE"
     },
     {
@@ -391,14 +451,34 @@
       "send": "MODE"
     },
     {
-      "label": "visit 13: UNMODE to force the pass",
+      "label": "visit 13: ask who you are",
       "expect": "[0-9]+%\\.-?[0-9]+>",
+      "send": "JA"
+    },
+    {
+      "label": "visit 13: UNMODE to force the pass",
+      "expect": "JESTES\\ NA\\ TRZYNASTYM\\ LEVELU",
       "send": "UNMODE"
     },
     {
       "label": "visit 13: level-up banner, then grant 1/2 for level 14",
       "expect": "ZDOBYLES LEVEL",
       "send": "DAWAJ KUNSZT"
+    },
+    {
+      "label": "final visit: MODE to read the sheet once more",
+      "expect": "[0-9]+%\\.-?[0-9]+>",
+      "send": "MODE"
+    },
+    {
+      "label": "final visit: the very high level message",
+      "expect": "[0-9]+%\\.-?[0-9]+>",
+      "send": "JA"
+    },
+    {
+      "label": "final visit: the very high level message is shown",
+      "expect": "JESTES\\ NA\\ BARDZO\\ WYSOKIM\\ LEVELU",
+      "send": "UNMODE"
     },
     {
       "label": "leave the room at the end",
