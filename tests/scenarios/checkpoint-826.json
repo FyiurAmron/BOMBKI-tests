@@ -338,6 +338,46 @@
     {
       "label": "budowla (61)",
       "expect": "KIEDY PODSZEDLES BLIZEJ ZBARANIALES - TO SALA KONCERTOWA",
+      "send": "MODE"
+    },
+    {
+      "label": "fill energy",
+      "expect": "[0-9]+%\\.-?[0-9]+>",
+      "send": "DAWAJ EN"
+    },
+    {
+      "label": "fill energy",
+      "expect": "[0-9]+%\\.-?[0-9]+>",
+      "send": "DAWAJ EN"
+    },
+    {
+      "label": "fill energy",
+      "expect": "[0-9]+%\\.-?[0-9]+>",
+      "send": "DAWAJ EN"
+    },
+    {
+      "label": "fill energy",
+      "expect": "[0-9]+%\\.-?[0-9]+>",
+      "send": "DAWAJ EN"
+    },
+    {
+      "label": "out of ground",
+      "expect": "[0-9]+%\\.-?[0-9]+>",
+      "send": "UNMODE"
+    },
+    {
+      "label": "budowla (61): kill GORYL",
+      "expect": "KIEDY PODSZEDLES BLIZEJ ZBARANIALES - TO SALA KONCERTOWA",
+      "send": "ZABIJ GORYL"
+    },
+    {
+      "label": "GORYL fight end",
+      "expect": "[\\s\\S]*?ZABILES GO[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
+      "send": "ZABIJ FAN"
+    },
+    {
+      "label": "FAN fight end",
+      "expect": "[\\s\\S]*?ZABILES GO[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
       "send": "POLNOC"
     },
     {
@@ -396,47 +436,12 @@
       "send": "POLODNIE"
     },
     {
-      "label": "tlum (63)",
-      "expect": "NA BRZEGACH TLUM JEST RZADSZY",
+      "label": "checkpoint 826 fires in tlum (63)",
+      "expect": "!!!CHECKPOINT!!![\\s\\S]*?NA BRZEGACH TLUM JEST RZADSZY[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
       "send": "MODE"
     },
     {
-      "label": "exit ground in tlum",
-      "expect": "[0-9]+%\\.-?[0-9]+>",
-      "send": "UNMODE"
-    },
-    {
-      "label": "tlum to dolina: send ZACHOD",
-      "expect": "NA BRZEGACH TLUM JEST RZADSZY",
-      "send": "ZACHOD"
-    },
-    {
-      "label": "tlum prompt after ZACHOD",
-      "expect": "[0-9]+%\\.-?[0-9]+>",
-      "send": ""
-    },
-    {
-      "label": "dolina (60)",
-      "expect": "JESTES W DOLINIE ROZRYWEK",
-      "send": "MODE"
-    },
-    {
-      "label": "wait for checkpoint",
-      "expect": "[0-9]+%\\.-?[0-9]+>",
-      "send": ""
-    },
-    {
-      "label": "wait for checkpoint",
-      "expect": "[0-9]+%\\.-?[0-9]+>",
-      "send": ""
-    },
-    {
-      "label": "wait for checkpoint",
-      "expect": "[0-9]+%\\.-?[0-9]+>",
-      "send": ""
-    },
-    {
-      "label": "exit game",
+      "label": "ground context",
       "expect": "[0-9]+%\\.-?[0-9]+>",
       "send": "WYJSCIE"
     },
