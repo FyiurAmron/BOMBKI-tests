@@ -8,7 +8,7 @@
     {
       "label": "race prompt",
       "expect": "NAPISZ SWA RASE",
-      "send": "CZLOWIEK"
+      "send": "NIMFA"
     },
     {
       "label": "player-name prompt",

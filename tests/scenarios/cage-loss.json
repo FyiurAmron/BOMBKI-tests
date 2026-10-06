@@ -28,15 +28,85 @@
     {
       "label": "the salon",
       "expect": "JESTES\\ W\\ OKROGLYM\\ SALONIE[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
-      "send": "POLNOC"
+      "send": "WSCHOD"
     },
     {
-      "label": "the city centre",
-      "expect": "JESTES\\ W\\ CENTRUM\\ MIASTA[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
-      "send": "POLODNIE"
+      "label": "rambo's room",
+      "expect": "JESTES\\ W\\ POKOJU\\ GDZIE\\ RAMBO\\ TRENUJE[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
+      "send": "TRENUJ"
+    },
+    {
+      "label": "train list",
+      "expect": "CO\\ CHCESZ\\ TRENOWAC",
+      "send": "TRENUJ ZRECZNOSC"
+    },
+    {
+      "label": "train zrecznosc",
+      "expect": "TRENUJESZ\\ ZRECZNOSC",
+      "send": "TRENUJ MADROSC"
+    },
+    {
+      "label": "train madrosc",
+      "expect": "TRENUJESZ\\ MADROSC",
+      "send": "ZACHOD"
     },
     {
       "label": "the salon again",
+      "expect": "JESTES\\ W\\ OKROGLYM\\ SALONIE[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
+      "send": "DOL"
+    },
+    {
+      "label": "the training room",
+      "expect": "ZSZEDLES\\ NA\\ DOL\\ GDZIE\\ TRENUJE\\ SIE\\ MEDYTUJAC[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
+      "send": "CWICZ UCIEKAC"
+    },
+    {
+      "label": "train flee 1",
+      "expect": "CWICZYSZ\\ UCIEKANIE",
+      "send": "CWICZ UCIEKAC"
+    },
+    {
+      "label": "train flee 2",
+      "expect": "CWICZYSZ\\ UCIEKANIE",
+      "send": "CWICZ UCIEKAC"
+    },
+    {
+      "label": "train flee 3",
+      "expect": "CWICZYSZ\\ UCIEKANIE",
+      "send": "CWICZ UCIEKAC"
+    },
+    {
+      "label": "train flee 4",
+      "expect": "CWICZYSZ\\ UCIEKANIE",
+      "send": "CWICZ UCIEKAC"
+    },
+    {
+      "label": "train flee 5",
+      "expect": "CWICZYSZ\\ UCIEKANIE",
+      "send": "MODE"
+    },
+    {
+      "label": "ground context",
+      "expect": "[0-9]+%\\.-?[0-9]+>",
+      "send": "ZWIEJ"
+    },
+    {
+      "label": "flee threshold prompt",
+      "expect": "PONIZEJ\\ ILU\\ ENERGII\\ CHCESZ\\ UCIEKAC",
+      "send": "900"
+    },
+    {
+      "label": "threshold set",
+      "expect": "[0-9]+%\\.-?[0-9]+>",
+      "send": "UNMODE"
+    },
+    {
+      "label": "back in the training room",
+      "expect": "ZSZEDLES\\ NA\\ DOL\\ GDZIE\\ TRENUJE\\ SIE\\ MEDYTUJAC[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
+      "send": "GORA"
+    },
+    {
+      "label": "the salon",
       "expect": "JESTES\\ W\\ OKROGLYM\\ SALONIE[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
       "send": "ZACHOD"
     },
@@ -56,52 +126,22 @@
       "send": "GORA"
     },
     {
-      "label": "before cage 12: enter ground",
+      "label": "the cage corridor",
       "expect": "JESTES\\ W\\ POKOJU\\ PROWADZACYM\\ DO\\ KLA[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
-      "send": "MODE"
-    },
-    {
-      "label": "fill energy",
-      "expect": "[0-9]+%\\.-?[0-9]+>",
-      "send": "DAWAJ EN"
-    },
-    {
-      "label": "fill energy",
-      "expect": "[0-9]+%\\.-?[0-9]+>",
-      "send": "DAWAJ EN"
-    },
-    {
-      "label": "fill energy",
-      "expect": "[0-9]+%\\.-?[0-9]+>",
-      "send": "DAWAJ EN"
-    },
-    {
-      "label": "fill energy",
-      "expect": "[0-9]+%\\.-?[0-9]+>",
-      "send": "DAWAJ EN"
-    },
-    {
-      "label": "out of ground",
-      "expect": "[0-9]+%\\.-?[0-9]+>",
-      "send": "UNMODE"
-    },
-    {
-      "label": "cage 12",
-      "expect": "JESTES W POKOJU PROWADZACYM DO KLA",
       "send": "WSCHOD"
     },
     {
-      "label": "cage 12: flee",
-      "expect": "TEN POKOJ JEST CALY OBRYZGANY KRWI[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
-      "send": "UCIEKAJ"
+      "label": "cage 12",
+      "expect": "TEN\\ POKOJ\\ JEST\\ CALY\\ OBRYZGANY\\ KRWI[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
+      "send": "ZABIJ POTWOR"
     },
     {
-      "label": "cage 12: after flee",
-      "expect": "[\\s\\S]*?WSTYD\\ !!!\\ UCIEKLES\\ Z\\ POLA\\ BITWY[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
+      "label": "cage 12: flee",
+      "expect": "WSTYD\\ !!!\\ UCIEKLES\\ Z\\ POLA\\ BITWY[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
       "send": "MODE"
     },
     {
-      "label": "exit",
+      "label": "ground context after flee",
       "expect": "[0-9]+%\\.-?[0-9]+>",
       "send": "WYJSCIE"
     },
