@@ -55,7 +55,8 @@ def prepare_game_dir(variant: str) -> Path:
     return game_dir
 
 
-def run_scenario(variant: str, scenario_path: Path) -> Path:
+def run_scenario(variant: str, scenario_path: Path,
+                 step_timeout: float) -> Path:
     """Run one scenario against one variant under DOSEMU2.
 
     Returns the transcript log path; raises RuntimeError when the
@@ -78,12 +79,12 @@ def run_scenario(variant: str, scenario_path: Path) -> Path:
     log.parent.mkdir(parents=True, exist_ok=True)
     steps = len(scenario["steps"])
     command = [sys.executable, str(HARNESS), str(WRAPPER), str(augmented),
-               "--log", str(log), "--timeout", str(STEP_TIMEOUT),
+               "--log", str(log), "--timeout", str(step_timeout),
                "--pyte"]
     try:
         result = subprocess.run(
             command, capture_output=True, text=True,
-            timeout=(steps + 2) * STEP_TIMEOUT + 30)
+            timeout=(steps + 2) * step_timeout + 30)
     except subprocess.TimeoutExpired as error:
         raise RuntimeError(
             f"exceeded its time bound; DOSEMU2 processes may have "
@@ -122,6 +123,11 @@ def main() -> int:
     parser.add_argument("--scenario", action="append", default=[],
                         help="run only these scenario stems (repeatable); "
                              "default: all")
+    parser.add_argument("--step-timeout", type=float,
+                        default=STEP_TIMEOUT,
+                        help="seconds allowed for each expected output "
+                             "(default: %(default)s; real-timing fight "
+                             "and sleep steps need several minutes)")
     args = parser.parse_args()
 
     scenario_paths = sorted(SCENARIO_DIR.glob("*.json"))
@@ -138,7 +144,8 @@ def main() -> int:
         for variant in ("original", "tp7"):
             started = time.monotonic()
             try:
-                run_scenario(variant, scenario_path)
+                run_scenario(variant, scenario_path,
+                             args.step_timeout)
             except (RuntimeError, OSError) as error:
                 print(f"  {variant}: FAILED: {error}")
                 failures += 1
