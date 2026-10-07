@@ -47,7 +47,7 @@ This file lists only remaining work.
    `tests/dosemu_scenarios.py` (22 steps in 17 scenarios exceed
    60 s under real timing, up to ~83 min for `sleep-rounds`),
    then run the full original+TP7 gate (serial, budget about
-   5 h).
+   5 h), plus the Pascal unit-test sources under genuine TP7.
    PRZEDM's SMIERC is
    never called in the original and is not in the unit
    interface, so no test can reach it; the coverage tool
@@ -64,10 +64,7 @@ This file lists only remaining work.
    its sword, shield, and heart drops and its flee path, and
    the whole quest-master road (the three quest purchases,
    all three hand-ins, the blocked and open west road, the
-   quest list, and killing the master). Next: the BOMBKI.PAS
-   command dispatch, room walking, and save/load paths, plus
-   MONSTRA.WSTEP (waits for a keypress), and running the same
-   test sources under genuine TP7 in DOSEMU2.
+   quest list, and killing the master).
 
 ## Completed
 
