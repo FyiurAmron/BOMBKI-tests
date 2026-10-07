@@ -53,6 +53,23 @@ This file lists only remaining work.
    original EXE and the genuine TP7 build under DOSEMU2
    with real timing, and runs only once coverage reaches
    100%. Never run more than one scenario at a time.
+
+3. **DOSEMU2 full-fidelity gate**: coverage is at 100%, so this
+   gate is unblocked, but it has never run green and needs a
+   timeout fix first. Measured budget (DOSEMU2 calibration on
+   the original EXE: about 3.3 s emulator startup/teardown per
+   run, about 0.2 s per step): about 143 min of real game
+   sleeps per variant (1720 WALKA rounds x 2 s, 1014 SPIJ hours
+   x 5 s, counted from the Callgrind transcripts) plus about
+   11 min harness overhead - roughly 2.6 h per variant,
+   roughly 5.1 h for the full original+TP7 gate (124 runs,
+   serial), wandering +/-20-30% run to run from clock-seeded
+   Random. Blocker: `tests/dosemu_scenarios.py` uses
+   STEP_TIMEOUT = 60.0, but 22 steps in 17 scenarios need more
+   than 60 s (fights up to about 5.6 min, `sleep-rounds`
+   step 8 waits for sleep hour 1000+, about 83 min) - raise
+   the timeouts before running the gate, or it fails on
+   timeout instead of behavior.
    PRZEDM's SMIERC is
    never called in the original and is not in the unit
    interface, so no test can reach it; the coverage tool
