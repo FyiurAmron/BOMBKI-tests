@@ -102,7 +102,7 @@ jobs:
 
       - name: Run every scenario against the dev build
         env:
-          BOMBKI_SEED: 0x9E3779B97F4A7C15
+          BOMBKI_SEED: "0x9E3779B97F4A7C15"
         run: |
           mkdir -p build/devruns
           fail=0
