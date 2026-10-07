@@ -6,16 +6,15 @@ This file lists only remaining work.
 
 1. **Coverage growth**: PRZEDM.PAS, MONSTRA.PAS, and SWIAT.PAS
    are at 100% of their reachable lines. The reproducible total is
-   **95.69%** (BOMBKI.PAS 92.09%, 157 of its lines remaining),
-   measured by `python3 tools/coverage_callgrind.py
-   --dump-uncovered` over 39 scenarios plus the Pascal unit
-   tests. That figure is stable: two consecutive runs give a
-   byte-identical uncovered set, because the coverage build stubs
-   both crt.Delay and the System PRNG (`tools/build_dev_game.py`),
-   so rolls no longer drift with the clock. All that remains is
-   BOMBKI.PAS: the command dispatch, the per-room handlers, and
-   save/load. Use `--fail-under 100` as the gate once it reaches
-   100%, then run the DOSEMU2 full-fidelity gate.
+   **99.97%** (3641 of 3642 reachable lines; BOMBKI.PAS line 2393,
+   the DZIADEK FAJKA drop, is the only line left), measured by
+   `python3 tools/coverage_callgrind.py --dump-uncovered` over the
+   scenario suite plus the Pascal unit tests. That figure is stable:
+   two consecutive runs give a byte-identical uncovered set, because
+   the coverage build stubs both crt.Delay and the System PRNG
+   (`tools/build_dev_game.py`), so rolls no longer drift with the
+   clock. Use `--fail-under 100` as the gate once the FAJKA drop is
+   covered, then run the DOSEMU2 full-fidelity gate.
 
 2. **Pascal unit tests**: `tests/units` holds the plain-Pascal
    test framework (`pastest.pas`) and the first test program

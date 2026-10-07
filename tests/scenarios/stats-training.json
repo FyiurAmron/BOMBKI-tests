@@ -471,64 +471,149 @@
       "send": "DAWAJ KUNSZT"
     },
     {
-      "label": "visit 12: grant xp 1/2",
+      "label": "extra trip 1: staruch drops POZIOM by one",
+      "expect": "[0-9]+%\\.-?[0-9]+>",
+      "send": "ZABIJ STARUCH"
+    },
+    {
+      "label": "extra trip 1: grant KUNSZT",
       "expect": "[0-9]+%\\.-?[0-9]+>",
       "send": "DAWAJ KUNSZT"
     },
     {
-      "label": "visit 12: grant xp 2/2",
-      "expect": "[0-9]+%\\.-?[0-9]+>",
-      "send": "DAWAJ KUNSZT"
-    },
-    {
-      "label": "visit 12: MODE into the ground context",
+      "label": "extra trip 1: MODE into the ground context",
       "expect": "[0-9]+%\\.-?[0-9]+>",
       "send": "MODE"
     },
     {
-      "label": "visit 12: ask who you are",
-      "expect": "[0-9]+%\\.-?[0-9]+>",
-      "send": "JA"
-    },
-    {
-      "label": "visit 12: UNMODE back to the den",
+      "label": "extra trip 1: UNMODE, second pass through 12",
       "expect": "[0-9]+%\\.-?[0-9]+>",
       "send": "UNMODE"
     },
     {
-      "label": "visit 12: level-up banner, then grant 1/2",
-      "expect": "ZDOBYLES LEVEL[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
+      "label": "extra trip 2: level-12 banner, then grant KUNSZT",
+      "expect": "HURRRA TO JUZ DWUNASTY POZIOM[\\s\\S]*?MASZ TERAZ",
       "send": "DAWAJ KUNSZT"
     },
     {
-      "label": "visit 13: grant xp 1/2",
+      "label": "extra trip 2: staruch drops POZIOM by one",
+      "expect": "[0-9]+%\\.-?[0-9]+>",
+      "send": "ZABIJ STARUCH"
+    },
+    {
+      "label": "extra trip 2: grant KUNSZT",
       "expect": "[0-9]+%\\.-?[0-9]+>",
       "send": "DAWAJ KUNSZT"
     },
     {
-      "label": "visit 13: grant xp 2/2",
-      "expect": "[0-9]+%\\.-?[0-9]+>",
-      "send": "DAWAJ KUNSZT"
-    },
-    {
-      "label": "visit 13: MODE into the ground context",
+      "label": "extra trip 2: MODE into the ground context",
       "expect": "[0-9]+%\\.-?[0-9]+>",
       "send": "MODE"
     },
     {
-      "label": "visit 13: ask who you are",
-      "expect": "[0-9]+%\\.-?[0-9]+>",
-      "send": "JA"
-    },
-    {
-      "label": "visit 13: UNMODE back to the den",
+      "label": "extra trip 2: UNMODE, pass 3 through 12",
       "expect": "[0-9]+%\\.-?[0-9]+>",
       "send": "UNMODE"
     },
     {
-      "label": "visit 13: level-up banner, then grant 1/2",
-      "expect": "ZDOBYLES LEVEL[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
+      "label": "extra trip 3: level-12 banner, then grant KUNSZT",
+      "expect": "HURRRA TO JUZ DWUNASTY POZIOM[\\s\\S]*?MASZ TERAZ",
       "send": "DAWAJ KUNSZT"
+    },
+    {
+      "label": "extra trip 3: staruch drops POZIOM by one",
+      "expect": "[0-9]+%\\.-?[0-9]+>",
+      "send": "ZABIJ STARUCH"
+    },
+    {
+      "label": "extra trip 3: grant KUNSZT",
+      "expect": "[0-9]+%\\.-?[0-9]+>",
+      "send": "DAWAJ KUNSZT"
+    },
+    {
+      "label": "extra trip 3: MODE into the ground context",
+      "expect": "[0-9]+%\\.-?[0-9]+>",
+      "send": "MODE"
+    },
+    {
+      "label": "extra trip 3: UNMODE, pass 4 through 12",
+      "expect": "[0-9]+%\\.-?[0-9]+>",
+      "send": "UNMODE"
+    },
+    {
+      "label": "extra trip 4: level-12 banner, then grant KUNSZT",
+      "expect": "HURRRA TO JUZ DWUNASTY POZIOM[\\s\\S]*?MASZ TERAZ",
+      "send": "DAWAJ KUNSZT"
+    },
+    {
+      "label": "extra trip 4: staruch drops POZIOM by one",
+      "expect": "[0-9]+%\\.-?[0-9]+>",
+      "send": "ZABIJ STARUCH"
+    },
+    {
+      "label": "extra trip 4: grant KUNSZT",
+      "expect": "[0-9]+%\\.-?[0-9]+>",
+      "send": "DAWAJ KUNSZT"
+    },
+    {
+      "label": "extra trip 4: MODE into the ground context",
+      "expect": "[0-9]+%\\.-?[0-9]+>",
+      "send": "MODE"
+    },
+    {
+      "label": "extra trip 4: UNMODE, pass 5 through 12",
+      "expect": "[0-9]+%\\.-?[0-9]+>",
+      "send": "UNMODE"
+    },
+    {
+      "label": "extra trip 5: level-12 banner, then grant KUNSZT",
+      "expect": "HURRRA TO JUZ DWUNASTY POZIOM[\\s\\S]*?MASZ TERAZ",
+      "send": "DAWAJ KUNSZT"
+    },
+    {
+      "label": "extra trip 5: staruch drops POZIOM by one",
+      "expect": "[0-9]+%\\.-?[0-9]+>",
+      "send": "ZABIJ STARUCH"
+    },
+    {
+      "label": "extra trip 5: grant KUNSZT",
+      "expect": "[0-9]+%\\.-?[0-9]+>",
+      "send": "DAWAJ KUNSZT"
+    },
+    {
+      "label": "extra trip 5: MODE into the ground context",
+      "expect": "[0-9]+%\\.-?[0-9]+>",
+      "send": "MODE"
+    },
+    {
+      "label": "extra trip 5: UNMODE, pass 6 through 12",
+      "expect": "[0-9]+%\\.-?[0-9]+>",
+      "send": "UNMODE"
+    },
+    {
+      "label": "extra trip 6: level-12 banner, then grant KUNSZT",
+      "expect": "HURRRA TO JUZ DWUNASTY POZIOM[\\s\\S]*?MASZ TERAZ",
+      "send": "DAWAJ KUNSZT"
+    },
+    {
+      "label": "extra trip 6: staruch drops POZIOM by one",
+      "expect": "[0-9]+%\\.-?[0-9]+>",
+      "send": "ZABIJ STARUCH"
+    },
+    {
+      "label": "extra trip 6: grant KUNSZT",
+      "expect": "[0-9]+%\\.-?[0-9]+>",
+      "send": "DAWAJ KUNSZT"
+    },
+    {
+      "label": "extra trip 6: MODE into the ground context",
+      "expect": "[0-9]+%\\.-?[0-9]+>",
+      "send": "MODE"
+    },
+    {
+      "label": "extra trip 6: UNMODE, pass 7 through 12",
+      "expect": "[0-9]+%\\.-?[0-9]+>",
+      "send": "UNMODE"
     },
     {
       "label": "back at the den prompt",
@@ -581,82 +666,137 @@
       "send": "TRENUJ"
     },
     {
-      "label": "train strength",
+      "label": "train strength 1/6",
       "expect": "CO CHCESZ TRENOWAC?[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
       "send": "TRENUJ SILA"
     },
     {
-      "label": "train strength",
+      "label": "train strength 2/6",
       "expect": "TRENUJESZ SILE I MASZ[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
       "send": "TRENUJ SILA"
     },
     {
-      "label": "train strength",
+      "label": "train strength 3/6",
       "expect": "TRENUJESZ SILE I MASZ[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
       "send": "TRENUJ SILA"
     },
     {
-      "label": "train strength",
+      "label": "train strength 4/6",
       "expect": "TRENUJESZ SILE I MASZ[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
       "send": "TRENUJ SILA"
     },
     {
-      "label": "train agility",
+      "label": "train strength 5/6",
+      "expect": "TRENUJESZ SILE I MASZ[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
+      "send": "TRENUJ SILA"
+    },
+    {
+      "label": "train strength 6/6",
+      "expect": "TRENUJESZ SILE I MASZ[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
+      "send": "TRENUJ SILA"
+    },
+    {
+      "label": "train agility 1/14",
       "expect": "TRENUJESZ SILE I MASZ[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
       "send": "TRENUJ ZRECZNOSC"
     },
     {
-      "label": "train agility",
+      "label": "train agility 2/14",
       "expect": "TRENUJESZ ZRECZNOSC I MASZ[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
       "send": "TRENUJ ZRECZNOSC"
     },
     {
-      "label": "train agility",
+      "label": "train agility 3/14",
       "expect": "TRENUJESZ ZRECZNOSC I MASZ[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
       "send": "TRENUJ ZRECZNOSC"
     },
     {
-      "label": "train agility",
+      "label": "train agility 4/14",
       "expect": "TRENUJESZ ZRECZNOSC I MASZ[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
       "send": "TRENUJ ZRECZNOSC"
     },
     {
-      "label": "train agility",
+      "label": "train agility 5/14",
       "expect": "TRENUJESZ ZRECZNOSC I MASZ[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
       "send": "TRENUJ ZRECZNOSC"
     },
     {
-      "label": "train cunning",
+      "label": "train agility 6/14",
+      "expect": "TRENUJESZ ZRECZNOSC I MASZ[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
+      "send": "TRENUJ ZRECZNOSC"
+    },
+    {
+      "label": "train agility 7/14",
+      "expect": "TRENUJESZ ZRECZNOSC I MASZ[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
+      "send": "TRENUJ ZRECZNOSC"
+    },
+    {
+      "label": "train agility 8/14",
+      "expect": "TRENUJESZ ZRECZNOSC I MASZ[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
+      "send": "TRENUJ ZRECZNOSC"
+    },
+    {
+      "label": "train agility 9/14",
+      "expect": "TRENUJESZ ZRECZNOSC I MASZ[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
+      "send": "TRENUJ ZRECZNOSC"
+    },
+    {
+      "label": "train agility 10/14",
+      "expect": "TRENUJESZ ZRECZNOSC I MASZ[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
+      "send": "TRENUJ ZRECZNOSC"
+    },
+    {
+      "label": "train agility 11/14",
+      "expect": "TRENUJESZ ZRECZNOSC I MASZ[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
+      "send": "TRENUJ ZRECZNOSC"
+    },
+    {
+      "label": "train agility 12/14",
+      "expect": "TRENUJESZ ZRECZNOSC I MASZ[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
+      "send": "TRENUJ ZRECZNOSC"
+    },
+    {
+      "label": "train agility 13/14",
+      "expect": "TRENUJESZ ZRECZNOSC I MASZ[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
+      "send": "TRENUJ ZRECZNOSC"
+    },
+    {
+      "label": "train agility 14/14",
+      "expect": "TRENUJESZ ZRECZNOSC I MASZ[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
+      "send": "TRENUJ ZRECZNOSC"
+    },
+    {
+      "label": "train cunning 1/7",
       "expect": "TRENUJESZ ZRECZNOSC I MASZ[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
       "send": "TRENUJ MADROSC"
     },
     {
-      "label": "train cunning",
+      "label": "train cunning 2/7",
       "expect": "TRENUJESZ MADROSC I MASZ[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
       "send": "TRENUJ MADROSC"
     },
     {
-      "label": "train cunning",
+      "label": "train cunning 3/7",
       "expect": "TRENUJESZ MADROSC I MASZ[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
       "send": "TRENUJ MADROSC"
     },
     {
-      "label": "train cunning",
+      "label": "train cunning 4/7",
       "expect": "TRENUJESZ MADROSC I MASZ[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
       "send": "TRENUJ MADROSC"
     },
     {
-      "label": "train cunning",
+      "label": "train cunning 5/7",
       "expect": "TRENUJESZ MADROSC I MASZ[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
       "send": "TRENUJ MADROSC"
     },
     {
-      "label": "train cunning",
+      "label": "train cunning 6/7",
       "expect": "TRENUJESZ MADROSC I MASZ[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
       "send": "TRENUJ MADROSC"
     },
     {
-      "label": "train cunning",
+      "label": "train cunning 7/7",
       "expect": "TRENUJESZ MADROSC I MASZ[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
       "send": "TRENUJ MADROSC"
     },
@@ -682,11 +822,6 @@
     },
     {
       "label": "learn fleeing 3/4",
-      "expect": "CWICZYSZ UCIEKANIE[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
-      "send": "CWICZ UCIEKAC"
-    },
-    {
-      "label": "fleeing is capped",
       "expect": "CWICZYSZ UCIEKANIE[\\s\\S]*?[0-9]+%\\.-?[0-9]+>",
       "send": "CWICZ UCIEKAC"
     },
