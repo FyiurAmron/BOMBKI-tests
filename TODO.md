@@ -4,18 +4,7 @@ This file lists only remaining work.
 
 ## Remaining work
 
-1. **Coverage growth**: DONE - all four units are at 100% of their
-   reachable lines. The reproducible total is **100%** (3642 of 3642
-   reachable lines; empty uncovered set, exit 0), measured by `python3
-   tools/coverage_callgrind.py --dump-uncovered` over 62 scenarios
-   plus the Pascal unit tests. The last gap was BOMBKI.PAS 2393
-   (`TU LEZY !FAJKA!`), covered by the `fajka-ground` shop route:
-   buy the FAJKA, MODE, drop it, UNMODE, MODE again (the ground item
-   checks run only on ground entry - each ground command loops back
-   via `goto L1012`, bypassing them). Keep `--fail-under 100` green;
-   next is the DOSEMU2 full-fidelity gate.
-
-2. **Pascal unit tests**: `tests/units` holds the plain-Pascal
+1. **Pascal unit tests**: `tests/units` holds the plain-Pascal
    test framework (`pastest.pas`) and the first test program
    (`test_przedm.pas`, 115 tests: MODE, KOMENDY, TRAIN,
    POTWORY ranges, TARCZA, BRANIE, UZYWANIE item round-trips,
@@ -54,22 +43,11 @@ This file lists only remaining work.
    with real timing, and runs only once coverage reaches
    100%. Never run more than one scenario at a time.
 
-3. **DOSEMU2 full-fidelity gate**: coverage is at 100%, so this
-   gate is unblocked, but it has never run green and needs a
-   timeout fix first. Measured budget (DOSEMU2 calibration on
-   the original EXE: about 3.3 s emulator startup/teardown per
-   run, about 0.2 s per step): about 143 min of real game
-   sleeps per variant (1720 WALKA rounds x 2 s, 1014 SPIJ hours
-   x 5 s, counted from the Callgrind transcripts) plus about
-   11 min harness overhead - roughly 2.6 h per variant,
-   roughly 5.1 h for the full original+TP7 gate (124 runs,
-   serial), wandering +/-20-30% run to run from clock-seeded
-   Random. Blocker: `tests/dosemu_scenarios.py` uses
-   STEP_TIMEOUT = 60.0, but 22 steps in 17 scenarios need more
-   than 60 s (fights up to about 5.6 min, `sleep-rounds`
-   step 8 waits for sleep hour 1000+, about 83 min) - raise
-   the timeouts before running the gate, or it fails on
-   timeout instead of behavior.
+2. **DOSEMU2 full-fidelity gate**: raise `STEP_TIMEOUT` in
+   `tests/dosemu_scenarios.py` (22 steps in 17 scenarios exceed
+   60 s under real timing, up to ~83 min for `sleep-rounds`),
+   then run the full original+TP7 gate (serial, budget about
+   5 h).
    PRZEDM's SMIERC is
    never called in the original and is not in the unit
    interface, so no test can reach it; the coverage tool
