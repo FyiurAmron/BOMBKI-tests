@@ -1,3 +1,5 @@
+*Dedicated to my children, today's and future; let The Sun always shine in your eyes.*
+
 # BOMBKI tests
 
 This project extends the reconstructed original BOMBKI Turbo Pascal 7.01
